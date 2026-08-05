@@ -1,447 +1,500 @@
 package com.escuelaposgrado.Intranet.service;
 
-import com.escuelaposgrado.Intranet.dto.UsuarioDTO;
-import com.escuelaposgrado.Intranet.model.Usuario;
-import com.escuelaposgrado.Intranet.model.Role;
-import com.escuelaposgrado.Intranet.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.escuelaposgrado.Intranet.dto.UsuarioDTO;
+import com.escuelaposgrado.Intranet.model.Role;
+import com.escuelaposgrado.Intranet.model.Usuario;
+import com.escuelaposgrado.Intranet.repository.UsuarioRepository;
+import com.escuelaposgrado.Intranet.service.exception.CodigoJaExisteException;
+import com.escuelaposgrado.Intranet.service.exception.EmailJaExisteException;
+import com.escuelaposgrado.Intranet.service.exception.UsuarioNotFoundException;
 
-/**
- * Servicio para la gestión de usuarios en el sistema de intranet
- */
 @Service
 @Transactional
 public class UsuarioService {
-    
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    
+
+    private static final ZoneId ZONE_ID =
+            ZoneId.of("America/Fortaleza");
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder) {
+
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     /**
-     * Obtener todos los usuarios activos
+     * Obter todos os usuários ativos.
      */
     @Transactional(readOnly = true)
     public List<Usuario> obtenerUsuariosActivos() {
         return usuarioRepository.findByActivoTrue();
     }
-    
+
     /**
-     * Obtener usuario por ID (entidad)
+     * Obter usuário por ID como DTO.
      */
     @Transactional(readOnly = true)
-    public Optional<Usuario> obtenerUsuarioEntidadPorId(Long id) {
-        return usuarioRepository.findById(id);
+    public UsuarioDTO obtenerUsuarioPorId(Long id) {
+        return convertirADTO(buscarUsuario(id));
     }
-    
+
     /**
-     * Obtener usuario por username
+     * Obter usuário por username.
      */
     @Transactional(readOnly = true)
     public Optional<Usuario> obtenerUsuarioPorUsername(String username) {
         return usuarioRepository.findByUsername(username);
     }
-    
+
     /**
-     * Obtener usuario por email (entidad)
+     * Obter usuário por email como DTO.
      */
     @Transactional(readOnly = true)
-    public Optional<Usuario> obtenerUsuarioEntidadPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+    public UsuarioDTO obtenerUsuarioPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsuarioNotFoundException(
+                                "Usuário não encontrado"));
+
+        return convertirADTO(usuario);
     }
-    
+
     /**
-     * Obtener usuarios por rol
+     * Obter usuários por role.
      */
     @Transactional(readOnly = true)
-    public List<Usuario> obtenerUsuariosPorRol(Role role) {
-        return usuarioRepository.findByRoleAndActivoTrue(role);
+    public List<UsuarioDTO> obtenerUsuariosPorRol(String rol) {
+
+        Role role = Role.valueOf(rol.toUpperCase());
+
+        return usuarioRepository
+                .findByRoleAndActivoTrue(role)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
     }
-    
+
     /**
-     * Obtener estudiantes activos
+     * Obter usuários paginados.
      */
     @Transactional(readOnly = true)
-    public List<Usuario> obtenerEstudiantesActivos() {
-        return usuarioRepository.findEstudiantesActivos();
+    public Page<UsuarioDTO> obtenerUsuariosPaginados(
+            Pageable pageable) {
+
+        Page<Usuario> usuarios =
+                usuarioRepository.findByEliminadoFalse(pageable);
+
+        return usuarios.map(this::convertirADTO);
     }
-    
+
     /**
-     * Obtener docentes activos
+     * Criar usuário.
      */
-    @Transactional(readOnly = true)
-    public List<Usuario> obtenerDocentesActivos() {
-        return usuarioRepository.findDocentesActivos();
+    public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
+
+        validarCriacao(usuarioDTO);
+
+        Usuario usuario = new Usuario();
+
+        usuario.setNombres(usuarioDTO.getNombres());
+        usuario.setApellidos(usuarioDTO.getApellidos());
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setCodigo(usuarioDTO.getCodigo());
+        usuario.setTelefono(usuarioDTO.getTelefono());
+        usuario.setDireccion(usuarioDTO.getDireccion());
+        usuario.setRol(Role.valueOf(
+                usuarioDTO.getRol().toUpperCase()));
+
+        usuario.setActivo(
+                usuarioDTO.getActivo() != null
+                        ? usuarioDTO.getActivo()
+                        : true
+        );
+
+        definirSenha(usuario, usuarioDTO);
+
+        usuario = usuarioRepository.save(usuario);
+
+        return convertirADTO(usuario);
     }
-    
+
     /**
-     * Obtener administrativos activos
+     * Atualizar usuário.
      */
-    @Transactional(readOnly = true)
-    public List<Usuario> obtenerAdministrativosActivos() {
-        return usuarioRepository.findAdministrativosActivos();
+    public UsuarioDTO actualizarUsuario(
+            Long id,
+            UsuarioDTO usuarioDTO) {
+
+        Usuario usuario = buscarUsuario(id);
+
+        validarAtualizacao(id, usuarioDTO);
+
+        atualizarDados(usuario, usuarioDTO);
+
+        usuario = usuarioRepository.save(usuario);
+
+        return convertirADTO(usuario);
     }
-    
+
     /**
-     * Buscar usuarios por texto (entidad)
+     * Validar dados de criação.
      */
-    @Transactional(readOnly = true)
-    public List<Usuario> buscarUsuariosEntidad(String texto) {
-        if (texto == null || texto.trim().isEmpty()) {
-            return obtenerUsuariosActivos();
+    private void validarCriacao(UsuarioDTO usuarioDTO) {
+
+        if (usuarioRepository.existsByEmail(
+                usuarioDTO.getEmail())) {
+
+            throw new EmailJaExisteException(
+                    usuarioDTO.getEmail());
         }
-        return usuarioRepository.buscarUsuarios(texto.trim());
+
+        if (usuarioRepository.existsByCodigo(
+                usuarioDTO.getCodigo())) {
+
+            throw new CodigoJaExisteException(
+                    usuarioDTO.getCodigo());
+        }
     }
-    
+
     /**
-     * Crear nuevo usuario
+     * Validar dados de atualização.
      */
-    public Usuario crearUsuario(Usuario usuario) {
-        // Validaciones adicionales si es necesario
-        if (usuarioRepository.existsByUsername(usuario.getUsername())) {
-            throw new RuntimeException("El username ya existe: " + usuario.getUsername());
+    private void validarAtualizacao(
+            Long id,
+            UsuarioDTO usuarioDTO) {
+
+        Usuario usuario = buscarUsuario(id);
+
+        if (!usuario.getEmail().equals(usuarioDTO.getEmail())
+                && usuarioRepository.existsByEmail(
+                        usuarioDTO.getEmail())) {
+
+            throw new EmailJaExisteException(
+                    usuarioDTO.getEmail());
         }
-        
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("El email ya existe: " + usuario.getEmail());
+
+        if (!usuario.getCodigo().equals(usuarioDTO.getCodigo())
+                && usuarioRepository.existsByCodigo(
+                        usuarioDTO.getCodigo())) {
+
+            throw new CodigoJaExisteException(
+                    usuarioDTO.getCodigo());
         }
-        
-        if (usuario.getDni() != null && usuarioRepository.existsByDni(usuario.getDni())) {
-            throw new RuntimeException("El DNI ya existe: " + usuario.getDni());
-        }
-        
-        return usuarioRepository.save(usuario);
     }
-    
+
     /**
-     * Actualizar usuario
+     * Atualizar os dados permitidos do usuário.
      */
-    public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
-        
-        // Actualizar campos permitidos
-        usuario.setNombres(usuarioActualizado.getNombres());
-        usuario.setApellidos(usuarioActualizado.getApellidos());
-        usuario.setEmail(usuarioActualizado.getEmail());
-        usuario.setTelefono(usuarioActualizado.getTelefono());
-        usuario.setDireccion(usuarioActualizado.getDireccion());
-        usuario.setEspecialidad(usuarioActualizado.getEspecialidad());
-        
-        return usuarioRepository.save(usuario);
+    private void atualizarDados(
+            Usuario usuario,
+            UsuarioDTO usuarioDTO) {
+
+        usuario.setNombres(usuarioDTO.getNombres());
+        usuario.setApellidos(usuarioDTO.getApellidos());
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setCodigo(usuarioDTO.getCodigo());
+        usuario.setTelefono(usuarioDTO.getTelefono());
+        usuario.setDireccion(usuarioDTO.getDireccion());
+
+        usuario.setRol(
+                Role.valueOf(
+                        usuarioDTO.getRol().toUpperCase()
+                )
+        );
+
+        usuario.setActivo(usuarioDTO.getActivo());
     }
-    
+
     /**
-     * Desactivar usuario (soft delete)
+     * Definir senha do usuário.
+     */
+    private void definirSenha(
+            Usuario usuario,
+            UsuarioDTO usuarioDTO) {
+
+        String senha = usuarioDTO.getPassword();
+
+        if (senha != null && !senha.isEmpty()) {
+            usuario.setPassword(
+                    passwordEncoder.encode(senha)
+            );
+            return;
+        }
+
+        usuario.setPassword(
+                passwordEncoder.encode(
+                        usuarioDTO.getCodigo()
+                )
+        );
+    }
+
+    /**
+     * Buscar usuário ou lançar exceção.
+     */
+    private Usuario buscarUsuario(Long id) {
+
+        return usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new UsuarioNotFoundException(
+                                "Usuário não encontrado com ID: " + id
+                        )
+                );
+    }
+
+    /**
+     * Eliminar usuário logicamente.
+     */
+    public void eliminarUsuario(Long id) {
+
+        Usuario usuario = buscarUsuario(id);
+
+        usuario.setEliminado(true);
+
+        usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Desativar usuário.
      */
     public void desactivarUsuario(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
-        
+
+        Usuario usuario = buscarUsuario(id);
+
         usuario.setActivo(false);
+
         usuarioRepository.save(usuario);
     }
-    
+
     /**
-     * Reactivar usuario
+     * Reativar usuário.
      */
     public void reactivarUsuario(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
-        
+
+        Usuario usuario = buscarUsuario(id);
+
         usuario.setActivo(true);
+
         usuarioRepository.save(usuario);
     }
-    
+
     /**
-     * Actualizar último acceso
+     * Alterar estado do usuário.
+     */
+    public void cambiarEstadoUsuario(
+            Long id,
+            Boolean activo) {
+
+        Usuario usuario = buscarUsuario(id);
+
+        usuario.setActivo(activo);
+
+        usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Atualizar último acesso.
      */
     public void actualizarUltimoAcceso(Long id) {
-        usuarioRepository.actualizarUltimoAcceso(id, LocalDateTime.now());
+
+        LocalDateTime agora =
+                LocalDateTime.now(ZONE_ID);
+
+        usuarioRepository.actualizarUltimoAcceso(
+                id,
+                agora
+        );
     }
-    
+
     /**
-     * Obtener usuarios recientes
+     * Obter usuários recentes.
      */
     @Transactional(readOnly = true)
     public List<Usuario> obtenerUsuariosRecientes() {
         return usuarioRepository.findUsuariosRecientes();
     }
-    
+
     /**
-     * Obtener usuarios con acceso reciente
+     * Obter usuários com acesso recente.
      */
     @Transactional(readOnly = true)
-    public List<Usuario> obtenerUsuariosConAccesoReciente(int dias) {
-        LocalDateTime fechaDesde = LocalDateTime.now().minusDays(dias);
-        return usuarioRepository.findUsuariosConAccesoDesde(fechaDesde);
+    public List<Usuario> obtenerUsuariosConAccesoReciente(
+            int dias) {
+
+        LocalDateTime dataInicial =
+                LocalDateTime.now(ZONE_ID)
+                        .minusDays(dias);
+
+        return usuarioRepository
+                .findUsuariosConAccesoDesde(dataInicial);
     }
-    
+
     /**
-     * Contar usuarios por rol
+     * Contar usuários por role.
      */
     @Transactional(readOnly = true)
     public long contarUsuariosPorRol(Role role) {
-        return usuarioRepository.countByRoleAndActivoTrue(role);
+        return usuarioRepository
+                .countByRoleAndActivoTrue(role);
     }
-    
+
     /**
-     * Verificar si un username está disponible
+     * Verificar disponibilidade do username.
      */
     @Transactional(readOnly = true)
-    public boolean isUsernameDisponible(String username) {
+    public boolean isUsernameDisponible(
+            String username) {
+
         return !usuarioRepository.existsByUsername(username);
     }
-    
+
     /**
-     * Verificar si un email está disponible
+     * Verificar disponibilidade do email.
      */
     @Transactional(readOnly = true)
     public boolean isEmailDisponible(String email) {
+
         return !usuarioRepository.existsByEmail(email);
     }
-    
+
     /**
-     * Verificar si un DNI está disponible
+     * Verificar disponibilidade do DNI.
      */
     @Transactional(readOnly = true)
     public boolean isDniDisponible(String dni) {
+
         return !usuarioRepository.existsByDni(dni);
     }
-    
+
     /**
-     * Obtener estudiante por código
+     * Obter estudante por código.
      */
     @Transactional(readOnly = true)
-    public Optional<Usuario> obtenerEstudiantePorCodigo(String codigo) {
+    public Optional<Usuario> obtenerEstudiantePorCodigo(
+            String codigo) {
+
         return usuarioRepository.findByCodigoEstudiante(codigo);
     }
-    
+
     /**
-     * Obtener docente por código
+     * Obter docente por código.
      */
     @Transactional(readOnly = true)
-    public Optional<Usuario> obtenerDocentePorCodigo(String codigo) {
+    public Optional<Usuario> obtenerDocentePorCodigo(
+            String codigo) {
+
         return usuarioRepository.findByCodigoDocente(codigo);
     }
-    
-    // ============= MÉTODOS PARA CONTROLADOR DTO =============
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
+
     /**
-     * Obtener usuarios paginados como DTO
-     */
-    @Transactional(readOnly = true)
-    public Page<UsuarioDTO> obtenerUsuariosPaginados(Pageable pageable) {
-        Page<Usuario> usuarios = usuarioRepository.findByEliminadoFalse(pageable);
-        return usuarios.map(this::convertirADTO);
-    }
-    
-    /**
-     * Obtener usuario por ID como DTO
-     */
-    @Transactional(readOnly = true)
-    public UsuarioDTO obtenerUsuarioPorId(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return convertirADTO(usuario);
-    }
-    
-    /**
-     * Crear usuario desde DTO
-     */
-    public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
-        // Validaciones
-        if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
-            throw new RuntimeException("El email ya existe");
-        }
-        if (usuarioRepository.existsByCodigo(usuarioDTO.getCodigo())) {
-            throw new RuntimeException("El código ya existe");
-        }
-        
-        Usuario usuario = new Usuario();
-        usuario.setNombres(usuarioDTO.getNombres());
-        usuario.setApellidos(usuarioDTO.getApellidos());
-        usuario.setEmail(usuarioDTO.getEmail());
-        usuario.setCodigo(usuarioDTO.getCodigo());
-        usuario.setTelefono(usuarioDTO.getTelefono());
-        usuario.setDireccion(usuarioDTO.getDireccion());
-        usuario.setRol(Role.valueOf(usuarioDTO.getRol()));
-        usuario.setActivo(usuarioDTO.getActivo() != null ? usuarioDTO.getActivo() : true);
-        
-        if (usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().isEmpty()) {
-            usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
-        } else {
-            // Password por defecto basado en código
-            usuario.setPassword(passwordEncoder.encode(usuarioDTO.getCodigo()));
-        }
-        
-        usuario = usuarioRepository.save(usuario);
-        return convertirADTO(usuario);
-    }
-    
-    /**
-     * Actualizar usuario desde DTO
-     */
-    public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        // Validar email único (excluyendo el usuario actual)
-        if (!usuario.getEmail().equals(usuarioDTO.getEmail()) && 
-            usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
-            throw new RuntimeException("El email ya existe");
-        }
-        
-        // Validar código único (excluyendo el usuario actual)
-        if (!usuario.getCodigo().equals(usuarioDTO.getCodigo()) && 
-            usuarioRepository.existsByCodigo(usuarioDTO.getCodigo())) {
-            throw new RuntimeException("El código ya existe");
-        }
-        
-        usuario.setNombres(usuarioDTO.getNombres());
-        usuario.setApellidos(usuarioDTO.getApellidos());
-        usuario.setEmail(usuarioDTO.getEmail());
-        usuario.setCodigo(usuarioDTO.getCodigo());
-        usuario.setTelefono(usuarioDTO.getTelefono());
-        usuario.setDireccion(usuarioDTO.getDireccion());
-        usuario.setRol(Role.valueOf(usuarioDTO.getRol()));
-        usuario.setActivo(usuarioDTO.getActivo());
-        
-        usuario = usuarioRepository.save(usuario);
-        return convertirADTO(usuario);
-    }
-    
-    /**
-     * Eliminar usuario (soft delete)
-     */
-    public void eliminarUsuario(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        usuario.setEliminado(true);
-        usuarioRepository.save(usuario);
-    }
-    
-    /**
-     * Buscar usuarios como DTO
+     * Buscar usuários por texto.
      */
     @Transactional(readOnly = true)
     public List<UsuarioDTO> buscarUsuarios(String termino) {
-        List<Usuario> usuarios = usuarioRepository.buscarPorNombreOEmail(termino);
-        return usuarios.stream()
-            .map(this::convertirADTO)
-            .collect(Collectors.toList());
+
+        return usuarioRepository
+                .buscarPorNombreOEmail(termino)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
     }
-    
+
     /**
-     * Obtener usuarios por rol (String) como DTO
-     */
-    @Transactional(readOnly = true)
-    public List<UsuarioDTO> obtenerUsuariosPorRol(String rol) {
-        Role roleEnum = Role.valueOf(rol.toUpperCase());
-        List<Usuario> usuarios = obtenerUsuariosPorRol(roleEnum);
-        return usuarios.stream()
-            .map(this::convertirADTO)
-            .collect(Collectors.toList());
-    }
-    
-    /**
-     * Obtener estudiantes como DTO
+     * Obter estudantes como DTO.
      */
     @Transactional(readOnly = true)
     public List<UsuarioDTO> obtenerEstudiantes() {
-        List<Usuario> estudiantes = obtenerUsuariosPorRol(Role.ALUMNO);
-        return estudiantes.stream()
-            .map(this::convertirADTO)
-            .collect(Collectors.toList());
+
+        return obtenerUsuariosPorRol("ALUMNO");
     }
-    
+
     /**
-     * Obtener docentes como DTO
+     * Obter docentes como DTO.
      */
     @Transactional(readOnly = true)
     public List<UsuarioDTO> obtenerDocentes() {
-        List<Usuario> docentes = obtenerUsuariosPorRol(Role.DOCENTE);
-        return docentes.stream()
-            .map(this::convertirADTO)
-            .collect(Collectors.toList());
+
+        return obtenerUsuariosPorRol("DOCENTE");
     }
-    
+
     /**
-     * Cambiar contraseña
+     * Alterar senha.
      */
-    public void cambiarPassword(Long id, String passwordActual, String passwordNuevo) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        if (!passwordEncoder.matches(passwordActual, usuario.getPassword())) {
-            throw new RuntimeException("La contraseña actual es incorrecta");
+    public void cambiarPassword(
+            Long id,
+            String passwordActual,
+            String passwordNuevo) {
+
+        Usuario usuario = buscarUsuario(id);
+
+        if (!passwordEncoder.matches(
+                passwordActual,
+                usuario.getPassword())) {
+
+            throw new IllegalArgumentException(
+                    "A senha atual está incorreta"
+            );
         }
-        
-        usuario.setPassword(passwordEncoder.encode(passwordNuevo));
+
+        usuario.setPassword(
+                passwordEncoder.encode(passwordNuevo)
+        );
+
         usuarioRepository.save(usuario);
     }
-    
+
     /**
-     * Cambiar estado de usuario
-     */
-    public void cambiarEstadoUsuario(Long id, Boolean activo) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        usuario.setActivo(activo);
-        usuarioRepository.save(usuario);
-    }
-    
-    /**
-     * Obtener usuario por email como DTO
+     * Verificar se é o usuário atual.
      */
     @Transactional(readOnly = true)
-    public UsuarioDTO obtenerUsuarioPorEmail(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return convertirADTO(usuario);
+    public boolean esUsuarioActual(
+            Long id,
+            String email) {
+
+        Optional<Usuario> usuario =
+                usuarioRepository.findByEmail(email);
+
+        return usuario.isPresent()
+                && usuario.get().getId().equals(id);
     }
-    
+
     /**
-     * Verificar si es el usuario actual
-     */
-    @Transactional(readOnly = true)
-    public boolean esUsuarioActual(Long id, String email) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-        return usuario.isPresent() && usuario.get().getId().equals(id);
-    }
-    
-    /**
-     * Verificar si email es único
+     * Verificar se email é único.
      */
     @Transactional(readOnly = true)
     public boolean esEmailUnico(String email) {
         return !usuarioRepository.existsByEmail(email);
     }
-    
+
     /**
-     * Verificar si código es único
+     * Verificar se código é único.
      */
     @Transactional(readOnly = true)
     public boolean esCodigoUnico(String codigo) {
         return !usuarioRepository.existsByCodigo(codigo);
     }
-    
+
     /**
-     * Convertir entidad Usuario a DTO
+     * Converter entidade para DTO.
      */
     private UsuarioDTO convertirADTO(Usuario usuario) {
+
         UsuarioDTO dto = new UsuarioDTO();
+
         dto.setId(usuario.getId());
         dto.setNombres(usuario.getNombres());
         dto.setApellidos(usuario.getApellidos());
@@ -453,10 +506,12 @@ public class UsuarioService {
         dto.setActivo(usuario.getActivo());
         dto.setNombreCompleto(usuario.getNombreCompleto());
         dto.setFechaRegistro(usuario.getFechaRegistro());
-        dto.setFechaActualizacion(usuario.getFechaActualizacion());
+        dto.setFechaActualizacion(
+                usuario.getFechaActualizacion()
+        );
         dto.setUltimoAcceso(usuario.getUltimoAcceso());
         dto.setEliminado(usuario.getEliminado());
-        // No incluir password en el DTO
+
         return dto;
     }
 }

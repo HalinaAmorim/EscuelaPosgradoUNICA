@@ -1,0 +1,16 @@
+bugs=0
+code_smells=356
+cognitive_complexity=547
+complexity=1441
+coverage=0.0
+duplicated_blocks=39
+duplicated_files=27
+duplicated_lines_density=10.1
+ncloc=10070
+reliability_rating=1.0
+security_hotspots=0
+security_rating=1.0
+sqale_debt_ratio=1.0
+sqale_index=3101
+sqale_rating=1.0
+vulnerabilities=0

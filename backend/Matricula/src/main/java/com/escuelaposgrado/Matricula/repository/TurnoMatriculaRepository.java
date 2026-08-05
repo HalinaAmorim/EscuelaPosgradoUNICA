@@ -68,6 +68,11 @@ public interface TurnoMatriculaRepository extends JpaRepository<TurnoMatricula, 
     List<TurnoMatricula> findByPeriodoAcademicoIdAndProgramaEstudioIdAndActivoTrueOrderByOrdenTurnoAsc(Long periodoId, Long programaId);
 
     /**
+     * Buscar turnos activos por nombre (contiene, case-insensitive)
+     */
+    List<TurnoMatricula> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
+
+    /**
      * Verificar si existe turno con el mismo orden en el período
      */
     @Query("SELECT COUNT(t) > 0 FROM TurnoMatricula t WHERE t.periodoAcademico.id = :periodoId AND t.ordenTurno = :orden AND t.id != :turnoId AND t.activo = true")

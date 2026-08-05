@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +27,8 @@ import com.escuelaposgrado.Matricula.repository.TurnoMatriculaRepository;
 @Transactional
 public class TurnoMatriculaService {
 
+    private static final String MSG_TURNO_NO_ENCONTRADO = "Turno de matrícula no encontrado con ID: ";
+
     @Autowired
     private TurnoMatriculaRepository turnoMatriculaRepository;
 
@@ -37,242 +38,155 @@ public class TurnoMatriculaService {
     @Autowired
     private ProgramaEstudioRepository programaEstudioRepository;
 
-    /**
-     * Obtener todos los turnos de matrícula
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findAll() {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findAll();
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(turnoMatriculaRepository.findAll());
     }
 
-    /**
-     * Obtener todos los turnos activos
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findAllActive() {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findByActivoTrueOrderByOrdenTurnoAsc();
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(turnoMatriculaRepository.findByActivoTrueOrderByOrdenTurnoAsc());
     }
 
-    /**
-     * Obtener todos los turnos habilitados
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findAllEnabled() {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findByActivoTrueAndHabilitadoTrueOrderByOrdenTurnoAsc();
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(turnoMatriculaRepository.findByActivoTrueAndHabilitadoTrueOrderByOrdenTurnoAsc());
     }
 
-    /**
-     * Obtener turnos por período académico
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findByPeriodoAcademico(Long periodoId) {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findByPeriodoAcademicoIdAndActivoTrueOrderByOrdenTurnoAsc(periodoId);
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(
+                turnoMatriculaRepository.findByPeriodoAcademicoIdAndActivoTrueOrderByOrdenTurnoAsc(periodoId));
     }
 
-    /**
-     * Obtener turnos por programa de estudio
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findByProgramaEstudio(Long programaId) {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findByProgramaEstudioIdAndActivoTrueOrderByOrdenTurnoAsc(programaId);
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(
+                turnoMatriculaRepository.findByProgramaEstudioIdAndActivoTrueOrderByOrdenTurnoAsc(programaId));
     }
 
-    /**
-     * Obtener turnos por período y programa
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findByPeriodoAndPrograma(Long periodoId, Long programaId) {
-        List<TurnoMatricula> turnos = turnoMatriculaRepository.findByPeriodoAcademicoIdAndProgramaEstudioIdAndActivoTrueOrderByOrdenTurnoAsc(periodoId, programaId);
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(
+                turnoMatriculaRepository.findByPeriodoAcademicoIdAndProgramaEstudioIdAndActivoTrueOrderByOrdenTurnoAsc(
+                        periodoId, programaId));
     }
 
-    /**
-     * Obtener turno por ID
-     */
     @Transactional(readOnly = true)
     public TurnoMatriculaResponse findById(Long id) {
-        TurnoMatricula turno = turnoMatriculaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Turno de matrícula no encontrado con ID: " + id));
-        return convertToResponse(turno);
+        return convertToResponse(findTurnoOrThrow(id));
     }
 
-    /**
-     * Crear nuevo turno de matrícula
-     */
     public TurnoMatriculaResponse create(TurnoMatriculaRequest request) {
-        // Validar que el período académico existe y está activo
-        PeriodoAcademico periodo = periodoAcademicoRepository.findById(request.getPeriodoAcademicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Período académico no encontrado con ID: " + request.getPeriodoAcademicoId()));
-        
-        if (!periodo.getActivo()) {
-            throw new BadRequestException("No se puede crear el turno en un período académico inactivo");
-        }
-
-        // Validar que el programa de estudio existe y está activo
-        ProgramaEstudio programa = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-        
-        if (!programa.getActivo()) {
-            throw new BadRequestException("No se puede crear el turno para un programa de estudio inactivo");
-        }
-
-        // Validar que no existe otro turno con el mismo código
-        if (turnoMatriculaRepository.findByCodigo(request.getCodigo()).isPresent()) {
-            throw new BadRequestException("Ya existe un turno con el código: " + request.getCodigo());
-        }
-
-        // Validar que no existe otro turno con el mismo nombre
-        if (turnoMatriculaRepository.findByNombre(request.getNombre()).isPresent()) {
-            throw new BadRequestException("Ya existe un turno con el nombre: " + request.getNombre());
-        }
-
-        // Validar fechas
-        if (request.getFechaInicio().isAfter(request.getFechaFin())) {
-            throw new BadRequestException("La fecha de inicio debe ser anterior a la fecha de fin");
-        }
+        ValidatedRefs refs = validateRequestRefs(request);
+        validateUniqueCodigoYNombre(request.getCodigo(), request.getNombre(), null);
+        validateFechas(request);
 
         TurnoMatricula turno = new TurnoMatricula();
-        turno.setNombre(request.getNombre());
-        turno.setCodigo(request.getCodigo());
-        turno.setFechaInicio(request.getFechaInicio());
-        turno.setFechaFin(request.getFechaFin());
-        turno.setOrdenTurno(request.getOrdenTurno());
-        turno.setHabilitado(request.getHabilitado() != null ? request.getHabilitado() : false);
-        turno.setDescripcion(request.getDescripcion());
-        turno.setRequisitos(request.getRequisitos());
-        turno.setPeriodoAcademico(periodo);
-        turno.setProgramaEstudio(programa);
+        applyRequestToEntity(turno, request, refs.periodo(), refs.programa());
+        turno.setHabilitado(Boolean.TRUE.equals(request.getHabilitado()));
         turno.setActivo(true);
 
-        TurnoMatricula savedTurno = turnoMatriculaRepository.save(turno);
-        return convertToResponse(savedTurno);
+        return convertToResponse(turnoMatriculaRepository.save(turno));
     }
 
-    /**
-     * Actualizar turno existente
-     */
     public TurnoMatriculaResponse update(Long id, TurnoMatriculaRequest request) {
-        TurnoMatricula turno = turnoMatriculaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Turno de matrícula no encontrado con ID: " + id));
+        TurnoMatricula turno = findTurnoOrThrow(id);
+        ValidatedRefs refs = validateRequestRefs(request);
+        validateUniqueCodigoYNombre(request.getCodigo(), request.getNombre(), id);
+        validateFechas(request);
 
-        // Validar que el período académico existe y está activo
-        PeriodoAcademico periodo = periodoAcademicoRepository.findById(request.getPeriodoAcademicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Período académico no encontrado con ID: " + request.getPeriodoAcademicoId()));
-        
-        if (!periodo.getActivo()) {
-            throw new BadRequestException("No se puede asignar el turno a un período académico inactivo");
+        applyRequestToEntity(turno, request, refs.periodo(), refs.programa());
+        if (request.getHabilitado() != null) {
+            turno.setHabilitado(request.getHabilitado());
         }
 
-        // Validar que el programa de estudio existe y está activo
-        ProgramaEstudio programa = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-        
-        if (!programa.getActivo()) {
-            throw new BadRequestException("No se puede asignar el turno a un programa de estudio inactivo");
-        }
-
-        // Validar que no existe otro turno con el mismo código (excluyendo el actual)
-        Optional<TurnoMatricula> turnoExistentePorCodigo = turnoMatriculaRepository.findByCodigo(request.getCodigo());
-        if (turnoExistentePorCodigo.isPresent() && !turnoExistentePorCodigo.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe un turno con el código: " + request.getCodigo());
-        }
-
-        // Validar que no existe otro turno con el mismo nombre (excluyendo el actual)
-        Optional<TurnoMatricula> turnoExistentePorNombre = turnoMatriculaRepository.findByNombre(request.getNombre());
-        if (turnoExistentePorNombre.isPresent() && !turnoExistentePorNombre.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe un turno con el nombre: " + request.getNombre());
-        }
-
-        // Validar fechas
-        if (request.getFechaInicio().isAfter(request.getFechaFin())) {
-            throw new BadRequestException("La fecha de inicio debe ser anterior a la fecha de fin");
-        }
-
-        turno.setNombre(request.getNombre());
-        turno.setCodigo(request.getCodigo());
-        turno.setFechaInicio(request.getFechaInicio());
-        turno.setFechaFin(request.getFechaFin());
-        turno.setOrdenTurno(request.getOrdenTurno());
-        turno.setHabilitado(request.getHabilitado() != null ? request.getHabilitado() : turno.getHabilitado());
-        turno.setDescripcion(request.getDescripcion());
-        turno.setRequisitos(request.getRequisitos());
-        turno.setPeriodoAcademico(periodo);
-        turno.setProgramaEstudio(programa);
-
-        TurnoMatricula updatedTurno = turnoMatriculaRepository.save(turno);
-        return convertToResponse(updatedTurno);
+        return convertToResponse(turnoMatriculaRepository.save(turno));
     }
 
-    /**
-     * Activar/desactivar turno
-     */
     public TurnoMatriculaResponse toggleActive(Long id) {
-        TurnoMatricula turno = turnoMatriculaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Turno de matrícula no encontrado con ID: " + id));
-
-        turno.setActivo(!turno.getActivo());
-        TurnoMatricula updatedTurno = turnoMatriculaRepository.save(turno);
-        return convertToResponse(updatedTurno);
+        TurnoMatricula turno = findTurnoOrThrow(id);
+        turno.setActivo(!Boolean.TRUE.equals(turno.getActivo()));
+        return convertToResponse(turnoMatriculaRepository.save(turno));
     }
 
-    /**
-     * Habilitar/deshabilitar turno para matrícula
-     */
     public TurnoMatriculaResponse toggleEnabled(Long id) {
-        TurnoMatricula turno = turnoMatriculaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Turno de matrícula no encontrado con ID: " + id));
-
-        turno.setHabilitado(!turno.getHabilitado());
-        TurnoMatricula updatedTurno = turnoMatriculaRepository.save(turno);
-        return convertToResponse(updatedTurno);
+        TurnoMatricula turno = findTurnoOrThrow(id);
+        turno.setHabilitado(!Boolean.TRUE.equals(turno.getHabilitado()));
+        return convertToResponse(turnoMatriculaRepository.save(turno));
     }
 
-    /**
-     * Eliminar turno (borrado lógico)
-     */
     public void delete(Long id) {
-        TurnoMatricula turno = turnoMatriculaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Turno de matrícula no encontrado con ID: " + id));
-
+        TurnoMatricula turno = findTurnoOrThrow(id);
         turno.setActivo(false);
         turnoMatriculaRepository.save(turno);
     }
 
-    /**
-     * Buscar turnos por nombre
-     */
     @Transactional(readOnly = true)
     public List<TurnoMatriculaResponse> findByNombreContaining(String nombre) {
-        // Como no existe el método exacto en el repositorio, usar findAll y filtrar
-        List<TurnoMatricula> todosTurnos = turnoMatriculaRepository.findAll();
-        List<TurnoMatricula> turnos = todosTurnos.stream()
-                .filter(turno -> turno.getNombre().toLowerCase().contains(nombre.toLowerCase()) && turno.getActivo())
-                .collect(Collectors.toList());
-        return turnos.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapToResponse(turnoMatriculaRepository.findByNombreContainingIgnoreCaseAndActivoTrue(nombre));
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private ValidatedRefs validateRequestRefs(TurnoMatriculaRequest request) {
+        PeriodoAcademico periodo = periodoAcademicoRepository.findById(request.getPeriodoAcademicoId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Período académico no encontrado con ID: " + request.getPeriodoAcademicoId()));
+
+        if (!Boolean.TRUE.equals(periodo.getActivo())) {
+            throw new BadRequestException("No se puede usar un período académico inactivo");
+        }
+
+        ProgramaEstudio programa = programaEstudioRepository.findById(request.getProgramaEstudioId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
+
+        if (!Boolean.TRUE.equals(programa.getActivo())) {
+            throw new BadRequestException("No se puede usar un programa de estudio inactivo");
+        }
+
+        return new ValidatedRefs(periodo, programa);
+    }
+
+    private void validateUniqueCodigoYNombre(String codigo, String nombre, Long excludeId) {
+        Optional<TurnoMatricula> porCodigo = turnoMatriculaRepository.findByCodigo(codigo);
+        if (porCodigo.isPresent() && (excludeId == null || !porCodigo.get().getId().equals(excludeId))) {
+            throw new BadRequestException("Ya existe un turno con el código: " + codigo);
+        }
+
+        Optional<TurnoMatricula> porNombre = turnoMatriculaRepository.findByNombre(nombre);
+        if (porNombre.isPresent() && (excludeId == null || !porNombre.get().getId().equals(excludeId))) {
+            throw new BadRequestException("Ya existe un turno con el nombre: " + nombre);
+        }
+    }
+
+    private void validateFechas(TurnoMatriculaRequest request) {
+        if (request.getFechaInicio().isAfter(request.getFechaFin())) {
+            throw new BadRequestException("La fecha de inicio debe ser anterior a la fecha de fin");
+        }
+    }
+
+    private void applyRequestToEntity(TurnoMatricula turno, TurnoMatriculaRequest request,
+                                      PeriodoAcademico periodo, ProgramaEstudio programa) {
+        turno.setNombre(request.getNombre());
+        turno.setCodigo(request.getCodigo());
+        turno.setFechaInicio(request.getFechaInicio());
+        turno.setFechaFin(request.getFechaFin());
+        turno.setOrdenTurno(request.getOrdenTurno());
+        turno.setDescripcion(request.getDescripcion());
+        turno.setRequisitos(request.getRequisitos());
+        turno.setPeriodoAcademico(periodo);
+        turno.setProgramaEstudio(programa);
+    }
+
+    private TurnoMatricula findTurnoOrThrow(Long id) {
+        return turnoMatriculaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_TURNO_NO_ENCONTRADO + id));
+    }
+
+    private List<TurnoMatriculaResponse> mapToResponse(List<TurnoMatricula> turnos) {
+        return turnos.stream().map(this::convertToResponse).toList();
+    }
+
     private TurnoMatriculaResponse convertToResponse(TurnoMatricula turno) {
         TurnoMatriculaResponse response = new TurnoMatriculaResponse();
         response.setId(turno.getId());
@@ -288,7 +202,6 @@ public class TurnoMatriculaService {
         response.setFechaCreacion(turno.getFechaCreacion());
         response.setFechaActualizacion(turno.getFechaActualizacion());
 
-        // Convertir información del período académico
         if (turno.getPeriodoAcademico() != null) {
             PeriodoAcademicoBasicResponse periodoBasic = new PeriodoAcademicoBasicResponse();
             periodoBasic.setId(turno.getPeriodoAcademico().getId());
@@ -297,7 +210,6 @@ public class TurnoMatriculaService {
             response.setPeriodoAcademico(periodoBasic);
         }
 
-        // Convertir información del programa de estudio
         if (turno.getProgramaEstudio() != null) {
             ProgramaEstudioBasicResponse programaBasic = new ProgramaEstudioBasicResponse();
             programaBasic.setId(turno.getProgramaEstudio().getId());
@@ -308,4 +220,6 @@ public class TurnoMatriculaService {
 
         return response;
     }
+
+    private record ValidatedRefs(PeriodoAcademico periodo, ProgramaEstudio programa) {}
 }

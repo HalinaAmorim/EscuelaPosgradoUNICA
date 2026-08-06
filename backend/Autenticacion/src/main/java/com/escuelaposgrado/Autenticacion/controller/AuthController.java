@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,8 +38,6 @@ import jakarta.validation.Valid;
  * Controlador REST para la autenticación
  */
 @Tag(name = "🔐 Autenticación", description = "Endpoints para autenticación y registro de usuarios")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
-             allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

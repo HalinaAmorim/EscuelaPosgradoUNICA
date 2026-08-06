@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * Controlador REST para health checks y información del servicio
  */
 @Tag(name = "💊 Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
-             allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/health")
 public class HealthController {

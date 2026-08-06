@@ -1,0 +1,16 @@
+backend\Autenticacion\src\main\java\com\escuelaposgrado\Autenticacion\dto\response\AuthResponse.java:34: warning: AuthResponse::AuthResponse has 10 NLOC, 1 CCN, 67 token, 7 PARAM, 10 length, 0 ND
+backend\Autenticacion\src\main\java\com\escuelaposgrado\Autenticacion\model\entity\Usuario.java:114: warning: Usuario::Usuario has 11 NLOC, 1 CCN, 71 token, 7 PARAM, 11 length, 0 ND
+backend\Intranet\src\main\java\com\escuelaposgrado\Intranet\dto\CalificacionDTO.java:64: warning: CalificacionDTO::CalificacionDTO has 10 NLOC, 1 CCN, 67 token, 7 PARAM, 10 length, 0 ND
+backend\Intranet\src\main\java\com\escuelaposgrado\Intranet\model\Calificacion.java:98: warning: Calificacion::Calificacion has 10 NLOC, 1 CCN, 67 token, 7 PARAM, 10 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\request\AulaRequest.java:40: warning: AulaRequest::AulaRequest has 9 NLOC, 1 CCN, 67 token, 7 PARAM, 9 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\request\ProgramaEstudioRequest.java:45: warning: ProgramaEstudioRequest::ProgramaEstudioRequest has 13 NLOC, 1 CCN, 85 token, 9 PARAM, 13 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\request\TasaPagoRequest.java:49: warning: TasaPagoRequest::TasaPagoRequest has 15 NLOC, 1 CCN, 94 token, 10 PARAM, 15 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\request\TurnoMatriculaRequest.java:50: warning: TurnoMatriculaRequest::TurnoMatriculaRequest has 15 NLOC, 1 CCN, 94 token, 10 PARAM, 15 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\AulaResponse.java:26: warning: AulaResponse::AulaResponse has 10 NLOC, 1 CCN, 76 token, 8 PARAM, 10 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\PeriodoAcademicoResponse.java:28: warning: PeriodoAcademicoResponse::PeriodoAcademicoResponse has 20 NLOC, 1 CCN, 130 token, 14 PARAM, 20 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\ProgramaEstudioResponse.java:30: warning: ProgramaEstudioResponse::ProgramaEstudioResponse has 15 NLOC, 1 CCN, 103 token, 11 PARAM, 15 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\SedeResponse.java:23: warning: SedeResponse::SedeResponse has 9 NLOC, 1 CCN, 67 token, 7 PARAM, 9 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\TasaPagoResponse.java:31: warning: TasaPagoResponse::TasaPagoResponse has 12 NLOC, 1 CCN, 85 token, 9 PARAM, 12 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\dto\response\TurnoMatriculaResponse.java:31: warning: TurnoMatriculaResponse::TurnoMatriculaResponse has 14 NLOC, 1 CCN, 94 token, 10 PARAM, 14 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\model\entity\PeriodoAcademico.java:91: warning: PeriodoAcademico::PeriodoAcademico has 11 NLOC, 1 CCN, 67 token, 7 PARAM, 11 length, 0 ND
+backend\Matricula\src\main\java\com\escuelaposgrado\Matricula\model\entity\TurnoMatricula.java:87: warning: TurnoMatricula::TurnoMatricula has 11 NLOC, 1 CCN, 67 token, 7 PARAM, 11 length, 0 ND

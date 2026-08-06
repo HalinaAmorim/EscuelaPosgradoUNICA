@@ -12,7 +12,6 @@ import com.escuelaposgrado.Intranet.repository.AsistenciaRepository;
 import com.escuelaposgrado.Intranet.repository.MateriaRepository;
 import com.escuelaposgrado.Intranet.repository.UsuarioRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Servicio para la gestión de asistencias
+ * Servicio de aplicación para asistencias académicas.
  */
 @Service
 @Transactional
@@ -29,86 +28,64 @@ public class AsistenciaService {
     private static final String MSG_ESTUDIANTE_NO_ENCONTRADO = "Estudiante no encontrado";
     private static final String MSG_MATERIA_NO_ENCONTRADA = "Materia no encontrada";
     private static final String MSG_ASISTENCIA_NO_ENCONTRADA = "Asistencia no encontrada";
+    private static final String MSG_ASISTENCIA_DUPLICADA =
+            "Ya existe un registro de asistencia para esta fecha";
 
-    @Autowired
-    private AsistenciaRepository asistenciaRepository;
+    private final AsistenciaRepository asistenciaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final MateriaRepository materiaRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private MateriaRepository materiaRepository;
+    public AsistenciaService(AsistenciaRepository asistenciaRepository,
+                             UsuarioRepository usuarioRepository,
+                             MateriaRepository materiaRepository) {
+        this.asistenciaRepository = asistenciaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.materiaRepository = materiaRepository;
+    }
 
     public AsistenciaDTO registrarAsistencia(AsistenciaDTO asistenciaDTO, String registradoPor) {
         Usuario estudiante = findEstudiante(asistenciaDTO.getEstudianteId());
         Materia materia = findMateria(asistenciaDTO.getMateriaId());
-
-        if (asistenciaRepository.existsByEstudianteAndMateriaAndFecha(
-                estudiante, materia, asistenciaDTO.getFecha())) {
-            throw new BadRequestException("Ya existe un registro de asistencia para esta fecha");
-        }
+        assertNoDuplicateAttendance(estudiante, materia, asistenciaDTO.getFecha());
 
         Asistencia asistencia = new Asistencia();
-        asistencia.setEstudiante(estudiante);
-        asistencia.setMateria(materia);
-        asistencia.setFecha(asistenciaDTO.getFecha());
-        asistencia.setHoraEntrada(asistenciaDTO.getHoraEntrada());
-        asistencia.setHoraSalida(asistenciaDTO.getHoraSalida());
-        asistencia.setEstado(EstadoAsistencia.valueOf(asistenciaDTO.getEstado()));
-        asistencia.setObservaciones(asistenciaDTO.getObservaciones());
-        asistencia.setHorasAcademicas(asistenciaDTO.getHorasAcademicas());
-        asistencia.setRegistradoPor(registradoPor);
-
-        return convertirADTO(asistenciaRepository.save(asistencia));
+        applyCreateData(asistencia, asistenciaDTO, estudiante, materia, registradoPor);
+        return toDto(asistenciaRepository.save(asistencia));
     }
 
     public AsistenciaDTO actualizarAsistencia(Long id, AsistenciaDTO asistenciaDTO) {
         Asistencia asistencia = findAsistencia(id);
-        asistencia.setHoraEntrada(asistenciaDTO.getHoraEntrada());
-        asistencia.setHoraSalida(asistenciaDTO.getHoraSalida());
-        asistencia.setEstado(EstadoAsistencia.valueOf(asistenciaDTO.getEstado()));
-        asistencia.setObservaciones(asistenciaDTO.getObservaciones());
-        asistencia.setHorasAcademicas(asistenciaDTO.getHorasAcademicas());
-        return convertirADTO(asistenciaRepository.save(asistencia));
+        applyUpdateData(asistencia, asistenciaDTO);
+        return toDto(asistenciaRepository.save(asistencia));
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerAsistenciasPorEstudiante(Long estudianteId) {
         Usuario estudiante = findEstudiante(estudianteId);
-        return asistenciaRepository.findByEstudiante(estudiante).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findByEstudiante(estudiante));
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerAsistenciasPorMateria(Long materiaId) {
         Materia materia = findMateria(materiaId);
-        return asistenciaRepository.findByMateria(materia).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findByMateria(materia));
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerAsistenciasPorEstudianteYMateria(Long estudianteId, Long materiaId) {
         Usuario estudiante = findEstudiante(estudianteId);
         Materia materia = findMateria(materiaId);
-        return asistenciaRepository.findByEstudianteAndMateria(estudiante, materia).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findByEstudianteAndMateria(estudiante, materia));
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerAsistenciasPorFechas(LocalDate fechaInicio, LocalDate fechaFin) {
-        return asistenciaRepository.findByFechaBetween(fechaInicio, fechaFin).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findByFechaBetween(fechaInicio, fechaFin));
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerAsistenciasDelDia(LocalDate fecha) {
-        return asistenciaRepository.findAsistenciasDelDia(fecha).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findAsistenciasDelDia(fecha));
     }
 
     @Transactional(readOnly = true)
@@ -116,26 +93,23 @@ public class AsistenciaService {
         Usuario estudiante = findEstudiante(estudianteId);
         Materia materia = findMateria(materiaId);
 
-        long totalAsistencias = asistenciaRepository.countTotalAsistencias(estudiante, materia);
-        long asistenciasPresente = asistenciaRepository.countAsistenciasPresente(estudiante, materia);
-
-        if (totalAsistencias == 0) {
+        long total = asistenciaRepository.countTotalAsistencias(estudiante, materia);
+        if (total == 0) {
             return 0.0;
         }
-        return (asistenciasPresente * 100.0) / totalAsistencias;
+        long presentes = asistenciaRepository.countAsistenciasPresente(estudiante, materia);
+        return (presentes * 100.0) / total;
     }
 
     @Transactional(readOnly = true)
     public EstadisticasAsistenciaDTO obtenerEstadisticasEstudiante(Long estudianteId) {
         Usuario estudiante = findEstudiante(estudianteId);
 
-        long totalPresente = asistenciaRepository.countByEstudianteAndEstado(estudiante, EstadoAsistencia.PRESENTE);
-        long totalAusente = asistenciaRepository.countByEstudianteAndEstado(estudiante, EstadoAsistencia.AUSENTE);
-        long totalTardanza = asistenciaRepository.countByEstudianteAndEstado(estudiante, EstadoAsistencia.TARDANZA);
-        long totalJustificado = asistenciaRepository.countByEstudianteAndEstado(estudiante, EstadoAsistencia.JUSTIFICADO);
-
+        long totalPresente = countByEstado(estudiante, EstadoAsistencia.PRESENTE);
+        long totalAusente = countByEstado(estudiante, EstadoAsistencia.AUSENTE);
+        long totalTardanza = countByEstado(estudiante, EstadoAsistencia.TARDANZA);
+        long totalJustificado = countByEstado(estudiante, EstadoAsistencia.JUSTIFICADO);
         long total = totalPresente + totalAusente + totalTardanza + totalJustificado;
-        double porcentaje = total > 0 ? (totalPresente * 100.0) / total : 0.0;
 
         EstadisticasAsistenciaDTO estadisticas = new EstadisticasAsistenciaDTO();
         estadisticas.setEstudianteId(estudianteId);
@@ -145,16 +119,14 @@ public class AsistenciaService {
         estadisticas.setTotalTardanza(totalTardanza);
         estadisticas.setTotalJustificado(totalJustificado);
         estadisticas.setTotalClases(total);
-        estadisticas.setPorcentajeAsistencia(porcentaje);
+        estadisticas.setPorcentajeAsistencia(total > 0 ? (totalPresente * 100.0) / total : 0.0);
         return estadisticas;
     }
 
     @Transactional(readOnly = true)
     public List<AsistenciaDTO> obtenerReporteAsistencia(Long materiaId, LocalDate fecha) {
         Materia materia = findMateria(materiaId);
-        return asistenciaRepository.findReporteAsistenciaPorMateriaYFecha(materia, fecha).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(asistenciaRepository.findReporteAsistenciaPorMateriaYFecha(materia, fecha));
     }
 
     public void eliminarAsistencia(Long id) {
@@ -162,6 +134,37 @@ public class AsistenciaService {
             throw new ResourceNotFoundException(MSG_ASISTENCIA_NO_ENCONTRADA);
         }
         asistenciaRepository.deleteById(id);
+    }
+
+    private void assertNoDuplicateAttendance(Usuario estudiante, Materia materia, LocalDate fecha) {
+        if (asistenciaRepository.existsByEstudianteAndMateriaAndFecha(estudiante, materia, fecha)) {
+            throw new BadRequestException(MSG_ASISTENCIA_DUPLICADA);
+        }
+    }
+
+    private long countByEstado(Usuario estudiante, EstadoAsistencia estado) {
+        return asistenciaRepository.countByEstudianteAndEstado(estudiante, estado);
+    }
+
+    private void applyCreateData(Asistencia asistencia, AsistenciaDTO dto,
+                                 Usuario estudiante, Materia materia, String registradoPor) {
+        asistencia.setEstudiante(estudiante);
+        asistencia.setMateria(materia);
+        asistencia.setFecha(dto.getFecha());
+        applyUpdateData(asistencia, dto);
+        asistencia.setRegistradoPor(registradoPor);
+    }
+
+    private void applyUpdateData(Asistencia asistencia, AsistenciaDTO dto) {
+        asistencia.setHoraEntrada(dto.getHoraEntrada());
+        asistencia.setHoraSalida(dto.getHoraSalida());
+        asistencia.setEstado(EstadoAsistencia.valueOf(dto.getEstado()));
+        asistencia.setObservaciones(dto.getObservaciones());
+        asistencia.setHorasAcademicas(dto.getHorasAcademicas());
+    }
+
+    private List<AsistenciaDTO> mapAll(List<Asistencia> asistencias) {
+        return asistencias.stream().map(this::toDto).toList();
     }
 
     private Usuario findEstudiante(Long estudianteId) {
@@ -179,7 +182,7 @@ public class AsistenciaService {
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_ASISTENCIA_NO_ENCONTRADA));
     }
 
-    private AsistenciaDTO convertirADTO(Asistencia asistencia) {
+    private AsistenciaDTO toDto(Asistencia asistencia) {
         AsistenciaDTO dto = new AsistenciaDTO();
         dto.setId(asistencia.getId());
         dto.setEstudianteId(asistencia.getEstudiante().getId());

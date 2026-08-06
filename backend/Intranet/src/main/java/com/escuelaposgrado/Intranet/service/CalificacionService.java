@@ -14,7 +14,6 @@ import com.escuelaposgrado.Intranet.repository.CalificacionRepository;
 import com.escuelaposgrado.Intranet.repository.MateriaRepository;
 import com.escuelaposgrado.Intranet.repository.UsuarioRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Servicio para la gestión de calificaciones
+ * Servicio de aplicación para calificaciones académicas.
  */
 @Service
 @Transactional
@@ -38,174 +37,121 @@ public class CalificacionService {
     private static final String MSG_ESTUDIANTE_NO_ENCONTRADO = "Estudiante no encontrado";
     private static final String MSG_MATERIA_NO_ENCONTRADA = "Materia no encontrada";
     private static final String MSG_CALIFICACION_NO_ENCONTRADA = "Calificación no encontrada";
+    private static final String MSG_CALIFICACION_DUPLICADA =
+            "Ya existe una calificación de este tipo para esta fecha";
     private static final ZoneId ZONE_LIMA = ZoneId.of("America/Lima");
+    private static final int NOTA_SCALE = 2;
+    private static final int DEFAULT_RANKING_LIMIT = 10;
 
-    @Autowired
-    private CalificacionRepository calificacionRepository;
+    private final CalificacionRepository calificacionRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final MateriaRepository materiaRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private MateriaRepository materiaRepository;
+    public CalificacionService(CalificacionRepository calificacionRepository,
+                               UsuarioRepository usuarioRepository,
+                               MateriaRepository materiaRepository) {
+        this.calificacionRepository = calificacionRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.materiaRepository = materiaRepository;
+    }
 
     public CalificacionDTO registrarCalificacion(CalificacionDTO calificacionDTO, String registradoPor) {
         Usuario estudiante = findEstudiante(calificacionDTO.getEstudianteId());
         Materia materia = findMateria(calificacionDTO.getMateriaId());
-
-        if (calificacionRepository.existsByEstudianteAndMateriaAndTipoEvaluacionAndFechaEvaluacion(
-                estudiante, materia, TipoEvaluacion.valueOf(calificacionDTO.getTipoEvaluacion()),
-                calificacionDTO.getFechaEvaluacion())) {
-            throw new BadRequestException("Ya existe una calificación de este tipo para esta fecha");
-        }
+        assertNoDuplicateEvaluation(estudiante, materia, calificacionDTO);
 
         Calificacion calificacion = new Calificacion();
-        aplicarDatosCalificacion(calificacion, calificacionDTO, estudiante, materia);
+        applyCalificacionData(calificacion, calificacionDTO, estudiante, materia);
         calificacion.setRegistradoPor(registradoPor);
 
-        return convertirADTO(calificacionRepository.save(calificacion));
+        return toDto(calificacionRepository.save(calificacion));
     }
 
     public CalificacionDTO actualizarCalificacion(Long id, CalificacionDTO calificacionDTO) {
         Calificacion calificacion = findCalificacion(id);
-        aplicarDatosCalificacion(calificacion, calificacionDTO, calificacion.getEstudiante(), calificacion.getMateria());
-        return convertirADTO(calificacionRepository.save(calificacion));
+        applyCalificacionData(calificacion, calificacionDTO, calificacion.getEstudiante(), calificacion.getMateria());
+        return toDto(calificacionRepository.save(calificacion));
     }
 
     public CalificacionDTO corregirCalificacion(Long id, BigDecimal nuevaNota, String motivoCorreccion, String corregidoPor) {
         Calificacion calificacion = findCalificacion(id);
-
-        String observacionesActuales = calificacion.getObservaciones() != null ? calificacion.getObservaciones() : "";
-        String historialCorreccion = String.format(
-                "[CORRECCIÓN %s] Nota anterior: %s -> Nueva nota: %s. Motivo: %s. Corregido por: %s%n%s",
-                LocalDate.now(ZONE_LIMA), calificacion.getNota(), nuevaNota, motivoCorreccion, corregidoPor, observacionesActuales);
-
+        calificacion.setObservaciones(buildCorrectionHistory(
+                calificacion.getObservaciones(), calificacion.getNota(), nuevaNota, motivoCorreccion, corregidoPor));
         calificacion.setNota(nuevaNota);
-        calificacion.setObservaciones(historialCorreccion);
-
-        return convertirADTO(calificacionRepository.save(calificacion));
+        return toDto(calificacionRepository.save(calificacion));
     }
 
     @Transactional(readOnly = true)
     public List<CalificacionDTO> obtenerCalificacionesPorEstudiante(Long estudianteId) {
         Usuario estudiante = findEstudiante(estudianteId);
-        return calificacionRepository.findByEstudiante(estudiante).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(calificacionRepository.findByEstudiante(estudiante));
     }
 
     @Transactional(readOnly = true)
     public List<CalificacionDTO> obtenerCalificacionesPorMateria(Long materiaId) {
         Materia materia = findMateria(materiaId);
-        return calificacionRepository.findByMateria(materia).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(calificacionRepository.findByMateria(materia));
     }
 
     @Transactional(readOnly = true)
     public List<CalificacionDTO> obtenerCalificacionesPorEstudianteYMateria(Long estudianteId, Long materiaId) {
         Usuario estudiante = findEstudiante(estudianteId);
         Materia materia = findMateria(materiaId);
-        return calificacionRepository.findByEstudianteAndMateria(estudiante, materia).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(calificacionRepository.findByEstudianteAndMateria(estudiante, materia));
     }
 
     @Transactional(readOnly = true)
     public List<CalificacionDTO> obtenerCalificacionesPorCicloYAnio(String ciclo, Integer anio) {
-        return calificacionRepository.findByCicloAndAnio(Ciclo.valueOf(ciclo), anio).stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(calificacionRepository.findByCicloAndAnio(Ciclo.valueOf(ciclo), anio));
     }
 
     @Transactional(readOnly = true)
     public BigDecimal calcularPromedioEstudianteMateria(Long estudianteId, Long materiaId) {
         Usuario estudiante = findEstudiante(estudianteId);
         Materia materia = findMateria(materiaId);
-        BigDecimal promedio = calificacionRepository.calcularPromedioEstudianteMateria(estudiante, materia);
-        return promedio != null ? promedio.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+        return scaleOrZero(calificacionRepository.calcularPromedioEstudianteMateria(estudiante, materia));
     }
 
     @Transactional(readOnly = true)
     public BigDecimal calcularPromedioPonderado(Long estudianteId, Long materiaId) {
         Usuario estudiante = findEstudiante(estudianteId);
         Materia materia = findMateria(materiaId);
-        List<Calificacion> calificaciones = calificacionRepository.findByEstudianteAndMateria(estudiante, materia);
-
-        if (calificaciones.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal sumaNotas = BigDecimal.ZERO;
-        BigDecimal sumaPesos = BigDecimal.ZERO;
-
-        for (Calificacion calificacion : calificaciones) {
-            BigDecimal peso = calificacion.getPeso() != null ? calificacion.getPeso() : BigDecimal.ONE;
-            sumaNotas = sumaNotas.add(calificacion.getNota().multiply(peso));
-            sumaPesos = sumaPesos.add(peso);
-        }
-
-        if (sumaPesos.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
-        }
-
-        return sumaNotas.divide(sumaPesos, 2, RoundingMode.HALF_UP);
+        return computeWeightedAverage(calificacionRepository.findByEstudianteAndMateria(estudiante, materia));
     }
 
     @Transactional(readOnly = true)
     public EstadisticasCalificacionDTO obtenerEstadisticasMateria(Long materiaId) {
         Materia materia = findMateria(materiaId);
 
-        BigDecimal promedio = calificacionRepository.calcularPromedioMateria(materia);
-        BigDecimal notaMaxima = calificacionRepository.obtenerNotaMaximaMateria(materia);
-        BigDecimal notaMinima = calificacionRepository.obtenerNotaMinimaMateria(materia);
-        Long totalCalificaciones = calificacionRepository.countCalificacionesMateria(materia);
-
         EstadisticasCalificacionDTO estadisticas = new EstadisticasCalificacionDTO();
         estadisticas.setMateriaId(materiaId);
         estadisticas.setMateriaNombre(materia.getNombre());
-        estadisticas.setPromedio(promedio != null ? promedio.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
-        estadisticas.setNotaMaxima(notaMaxima != null ? notaMaxima : BigDecimal.ZERO);
-        estadisticas.setNotaMinima(notaMinima != null ? notaMinima : BigDecimal.ZERO);
-        estadisticas.setTotalCalificaciones(totalCalificaciones);
+        estadisticas.setPromedio(scaleOrZero(calificacionRepository.calcularPromedioMateria(materia)));
+        estadisticas.setNotaMaxima(nullToZero(calificacionRepository.obtenerNotaMaximaMateria(materia)));
+        estadisticas.setNotaMinima(nullToZero(calificacionRepository.obtenerNotaMinimaMateria(materia)));
+        estadisticas.setTotalCalificaciones(calificacionRepository.countCalificacionesMateria(materia));
         return estadisticas;
     }
 
     @Transactional(readOnly = true)
     public List<RankingEstudianteDTO> obtenerRankingEstudiantes(Long materiaId, Integer limite) {
         Materia materia = findMateria(materiaId);
-        Map<Usuario, List<Calificacion>> porEstudiante = calificacionRepository.findByMateria(materia).stream()
+        Map<Usuario, List<Calificacion>> byStudent = calificacionRepository.findByMateria(materia).stream()
                 .collect(Collectors.groupingBy(Calificacion::getEstudiante));
 
-        List<RankingEstudianteDTO> ranking = new ArrayList<>();
-        for (Map.Entry<Usuario, List<Calificacion>> entry : porEstudiante.entrySet()) {
-            List<Calificacion> calificacionesEstudiante = entry.getValue();
-            BigDecimal promedio = calificacionesEstudiante.stream()
-                    .map(Calificacion::getNota)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .divide(BigDecimal.valueOf(calificacionesEstudiante.size()), 2, RoundingMode.HALF_UP);
+        List<RankingEstudianteDTO> ranking = byStudent.entrySet().stream()
+                .map(entry -> toRankingEntry(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(RankingEstudianteDTO::getPromedio).reversed())
+                .collect(Collectors.toCollection(ArrayList::new));
 
-            RankingEstudianteDTO rankingDTO = new RankingEstudianteDTO();
-            rankingDTO.setEstudianteId(entry.getKey().getId());
-            rankingDTO.setEstudianteNombre(entry.getKey().getNombreCompleto());
-            rankingDTO.setPromedio(promedio);
-            ranking.add(rankingDTO);
-        }
-
-        ranking.sort(Comparator.comparing(RankingEstudianteDTO::getPromedio).reversed());
-        for (int i = 0; i < ranking.size(); i++) {
-            ranking.get(i).setPosicion(i + 1);
-        }
-
-        int maxResultados = limite != null ? limite : 10;
-        return ranking.stream().limit(maxResultados).toList();
+        assignPositions(ranking);
+        int maxResults = limite != null ? limite : DEFAULT_RANKING_LIMIT;
+        return ranking.stream().limit(maxResults).toList();
     }
 
     @Transactional(readOnly = true)
     public List<CalificacionDTO> obtenerCalificacionesPendientes() {
-        return calificacionRepository.findCalificacionesPendientes().stream()
-                .map(this::convertirADTO)
-                .toList();
+        return mapAll(calificacionRepository.findCalificacionesPendientes());
     }
 
     public void eliminarCalificacion(Long id) {
@@ -215,8 +161,69 @@ public class CalificacionService {
         calificacionRepository.deleteById(id);
     }
 
-    private void aplicarDatosCalificacion(Calificacion calificacion, CalificacionDTO dto,
-                                          Usuario estudiante, Materia materia) {
+    private void assertNoDuplicateEvaluation(Usuario estudiante, Materia materia, CalificacionDTO dto) {
+        boolean exists = calificacionRepository.existsByEstudianteAndMateriaAndTipoEvaluacionAndFechaEvaluacion(
+                estudiante,
+                materia,
+                TipoEvaluacion.valueOf(dto.getTipoEvaluacion()),
+                dto.getFechaEvaluacion());
+        if (exists) {
+            throw new BadRequestException(MSG_CALIFICACION_DUPLICADA);
+        }
+    }
+
+    private BigDecimal computeWeightedAverage(List<Calificacion> calificaciones) {
+        if (calificaciones.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal weightedSum = BigDecimal.ZERO;
+        BigDecimal weightSum = BigDecimal.ZERO;
+
+        for (Calificacion calificacion : calificaciones) {
+            BigDecimal weight = calificacion.getPeso() != null ? calificacion.getPeso() : BigDecimal.ONE;
+            weightedSum = weightedSum.add(calificacion.getNota().multiply(weight));
+            weightSum = weightSum.add(weight);
+        }
+
+        if (weightSum.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return weightedSum.divide(weightSum, NOTA_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private RankingEstudianteDTO toRankingEntry(Usuario estudiante, List<Calificacion> grades) {
+        BigDecimal average = grades.stream()
+                .map(Calificacion::getNota)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(grades.size()), NOTA_SCALE, RoundingMode.HALF_UP);
+
+        RankingEstudianteDTO rankingDTO = new RankingEstudianteDTO();
+        rankingDTO.setEstudianteId(estudiante.getId());
+        rankingDTO.setEstudianteNombre(estudiante.getNombreCompleto());
+        rankingDTO.setPromedio(average);
+        return rankingDTO;
+    }
+
+    private void assignPositions(List<RankingEstudianteDTO> ranking) {
+        for (int i = 0; i < ranking.size(); i++) {
+            ranking.get(i).setPosicion(i + 1);
+        }
+    }
+
+    private String buildCorrectionHistory(String currentObservations,
+                                          BigDecimal previousGrade,
+                                          BigDecimal newGrade,
+                                          String reason,
+                                          String correctedBy) {
+        String previousNotes = currentObservations != null ? currentObservations : "";
+        return String.format(
+                "[CORRECCIÓN %s] Nota anterior: %s -> Nueva nota: %s. Motivo: %s. Corregido por: %s%n%s",
+                LocalDate.now(ZONE_LIMA), previousGrade, newGrade, reason, correctedBy, previousNotes);
+    }
+
+    private void applyCalificacionData(Calificacion calificacion, CalificacionDTO dto,
+                                       Usuario estudiante, Materia materia) {
         calificacion.setEstudiante(estudiante);
         calificacion.setMateria(materia);
         calificacion.setNota(dto.getNota());
@@ -226,6 +233,18 @@ public class CalificacionService {
         calificacion.setObservaciones(dto.getObservaciones());
         calificacion.setCiclo(Ciclo.valueOf(dto.getCiclo()));
         calificacion.setAnio(dto.getAnio());
+    }
+
+    private List<CalificacionDTO> mapAll(List<Calificacion> calificaciones) {
+        return calificaciones.stream().map(this::toDto).toList();
+    }
+
+    private BigDecimal scaleOrZero(BigDecimal value) {
+        return value != null ? value.setScale(NOTA_SCALE, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    }
+
+    private BigDecimal nullToZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
     }
 
     private Usuario findEstudiante(Long estudianteId) {
@@ -243,7 +262,7 @@ public class CalificacionService {
                 .orElseThrow(() -> new ResourceNotFoundException(MSG_CALIFICACION_NO_ENCONTRADA));
     }
 
-    private CalificacionDTO convertirADTO(Calificacion calificacion) {
+    private CalificacionDTO toDto(Calificacion calificacion) {
         CalificacionDTO dto = new CalificacionDTO();
         dto.setId(calificacion.getId());
         dto.setEstudianteId(calificacion.getEstudiante().getId());

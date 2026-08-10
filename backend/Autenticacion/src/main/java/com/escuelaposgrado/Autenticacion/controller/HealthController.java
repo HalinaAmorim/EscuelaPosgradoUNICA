@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,20 +25,22 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Controlador REST para health checks y información del servicio
+ * Health checks e información del microservicio.
  */
-@Tag(name = "💊 Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
+@Tag(name = "Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"},
              allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/health")
 public class HealthController {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
+    private final BuildProperties buildProperties;
 
-    @Autowired(required = false)
-    private BuildProperties buildProperties;
+    public HealthController(DataSource dataSource, ObjectProvider<BuildProperties> buildPropertiesProvider) {
+        this.dataSource = dataSource;
+        this.buildProperties = buildPropertiesProvider.getIfAvailable();
+    }
 
     /**
      * Health check básico
@@ -46,7 +48,7 @@ public class HealthController {
     @Operation(
             summary = "Estado básico del servicio",
             description = "Verifica que el microservicio esté funcionando correctamente",
-            tags = {"💊 Salud del Sistema"}
+            tags = {"Salud del Sistema"}
     )
     @ApiResponses(value = {
             @ApiResponse(

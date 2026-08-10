@@ -2,7 +2,6 @@ package com.escuelaposgrado.Autenticacion.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.escuelaposgrado.Autenticacion.controller.support.AuthenticatedUserSupport;
 import com.escuelaposgrado.Autenticacion.dto.response.MessageResponse;
 import com.escuelaposgrado.Autenticacion.dto.response.UsuarioResponse;
 import com.escuelaposgrado.Autenticacion.model.enums.Role;
@@ -18,87 +18,56 @@ import com.escuelaposgrado.Autenticacion.service.AuthService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * Controlador REST para operaciones de coordinadores
- */
-@Tag(name = "👨‍💼 Coordinadores", description = "Endpoints específicos para coordinadores académicos")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
+@Tag(name = "Coordinadores", description = "Endpoints específicos para coordinadores académicos")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"},
              allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/coordinador")
 @PreAuthorize("hasAnyRole('COORDINADOR', 'ADMIN')")
 public class CoordinadorController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final AuthenticatedUserSupport userSupport;
 
-    /**
-     * Obtener perfil del coordinador actual
-     */
+    public CoordinadorController(AuthService authService, AuthenticatedUserSupport userSupport) {
+        this.authService = authService;
+        this.userSupport = userSupport;
+    }
+
     @GetMapping("/perfil")
     public ResponseEntity<UsuarioResponse> getPerfil(Authentication authentication) {
-        try {
-            UsuarioResponse response = authService.getCurrentUser(authentication.getName());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return userSupport.getCurrentUserOrBadRequest(authentication);
     }
 
-    /**
-     * Obtener todos los docentes
-     */
     @GetMapping("/docentes")
     public ResponseEntity<List<UsuarioResponse>> getDocentes() {
-        List<UsuarioResponse> docentes = authService.getUsuariosByRole(Role.DOCENTE);
-        return ResponseEntity.ok(docentes);
+        return ResponseEntity.ok(authService.getUsuariosByRole(Role.DOCENTE));
     }
 
-    /**
-     * Obtener todos los alumnos
-     */
     @GetMapping("/alumnos")
     public ResponseEntity<List<UsuarioResponse>> getAlumnos() {
-        List<UsuarioResponse> alumnos = authService.getUsuariosByRole(Role.ALUMNO);
-        return ResponseEntity.ok(alumnos);
+        return ResponseEntity.ok(authService.getUsuariosByRole(Role.ALUMNO));
     }
 
-    /**
-     * Obtener todos los postulantes
-     */
     @GetMapping("/postulantes")
     public ResponseEntity<List<UsuarioResponse>> getPostulantes() {
-        List<UsuarioResponse> postulantes = authService.getUsuariosByRole(Role.POSTULANTE);
-        return ResponseEntity.ok(postulantes);
+        return ResponseEntity.ok(authService.getUsuariosByRole(Role.POSTULANTE));
     }
 
-    /**
-     * Obtener otros coordinadores
-     */
     @GetMapping("/coordinadores")
     public ResponseEntity<List<UsuarioResponse>> getCoordinadores() {
-        List<UsuarioResponse> coordinadores = authService.getUsuariosByRole(Role.COORDINADOR);
-        return ResponseEntity.ok(coordinadores);
+        return ResponseEntity.ok(authService.getUsuariosByRole(Role.COORDINADOR));
     }
 
-    /**
-     * Mensaje de bienvenida para coordinadores
-     */
     @GetMapping("/bienvenida")
     public ResponseEntity<MessageResponse> getBienvenida(Authentication authentication) {
-        try {
-            UsuarioResponse usuario = authService.getCurrentUser(authentication.getName());
-            String mensaje = String.format("Bienvenido/a, %s. Panel de Coordinación Académica - Escuela de Posgrado UNICA", 
-                                          usuario.getNombreCompleto());
-            return ResponseEntity.ok(new MessageResponse(mensaje));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error al obtener información del usuario", false));
-        }
+        return userSupport.withCurrentUser(authentication,
+                usuario -> new MessageResponse(String.format(
+                        "Bienvenido/a, %s. Panel de Coordinación Académica - Escuela de Posgrado UNICA",
+                        usuario.getNombreCompleto())),
+                "Error al obtener información del usuario");
     }
 
-    /**
-     * Obtener resumen de usuarios para coordinación
-     */
     @GetMapping("/resumen")
     public ResponseEntity<MessageResponse> getResumen() {
         MessageResponse estadisticas = authService.getEstadisticas();

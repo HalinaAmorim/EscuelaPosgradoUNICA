@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,7 +45,7 @@ import jakarta.validation.Valid;
 /**
  * Controlador REST para operaciones administrativas
  */
-@Tag(name = "👨‍💼 Administración", description = "Endpoints exclusivos para administradores del sistema")
+@Tag(name = "Administracion", description = "Endpoints exclusivos para administradores del sistema")
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
              allowCredentials = "true", maxAge = 3600)
 @RestController
@@ -54,14 +53,17 @@ import jakarta.validation.Valid;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final DataCleanupService dataCleanupService;
+    private final ExcelService excelService;
 
-    @Autowired
-    private DataCleanupService dataCleanupService;
-
-    @Autowired
-    private ExcelService excelService;
+    public AdminController(AuthService authService,
+                           DataCleanupService dataCleanupService,
+                           ExcelService excelService) {
+        this.authService = authService;
+        this.dataCleanupService = dataCleanupService;
+        this.excelService = excelService;
+    }
 
     /**
      * Obtener todos los usuarios
@@ -70,7 +72,7 @@ public class AdminController {
             summary = "Obtener todos los usuarios",
             description = "Devuelve una lista de todos los usuarios activos en el sistema",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -105,7 +107,7 @@ public class AdminController {
             summary = "Crear nuevo usuario",
             description = "Permite al administrador crear un nuevo usuario en el sistema",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -175,7 +177,7 @@ public class AdminController {
         summary = "Obtener todos los usuarios (incluidos inactivos)",
         description = "Devuelve una lista de todos los usuarios en el sistema, incluidos los activos e inactivos.",
         security = @SecurityRequirement(name = "bearerAuth"),
-        tags = {"👨‍💼 Administración"}
+        tags = {"Administracion"}
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -200,7 +202,7 @@ public class AdminController {
             summary = "Obtener usuarios por rol",
             description = "Devuelve una lista de usuarios filtrados por el rol especificado",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -237,7 +239,7 @@ public class AdminController {
             summary = "Obtener usuarios por rol (incluidos inactivos)",
             description = "Devuelve una lista de usuarios filtrados por el rol especificado, incluidos los activos e inactivos",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -283,7 +285,7 @@ public class AdminController {
             summary = "Activar usuario",
             description = "Activa un usuario previamente desactivado en el sistema",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -346,7 +348,7 @@ public class AdminController {
             summary = "Actualizar datos de usuario",
             description = "Permite al administrador actualizar todos los datos de un usuario",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -456,7 +458,7 @@ public class AdminController {
             summary = "Buscar usuarios por nombres y apellidos",
             description = "Busca usuarios que coincidan parcialmente con el texto proporcionado en nombres o apellidos",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -493,7 +495,7 @@ public class AdminController {
             summary = "Limpiar datos duplicados",
             description = "Elimina registros duplicados de la base de datos basándose en campos únicos como username, email, DNI, etc.",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -563,7 +565,7 @@ public class AdminController {
             summary = "Exportar usuarios a Excel",
             description = "Exporta todos los usuarios del sistema a un archivo Excel",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -615,7 +617,7 @@ public class AdminController {
             summary = "Importar usuarios desde Excel",
             description = "Importa usuarios al sistema desde un archivo Excel. El archivo debe seguir el formato de la plantilla.",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -696,7 +698,7 @@ public class AdminController {
             summary = "Descargar plantilla Excel",
             description = "Descarga una plantilla de Excel con el formato correcto para importar usuarios",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"👨‍💼 Administración"}
+            tags = {"Administracion"}
     )
     @ApiResponses(value = {
             @ApiResponse(

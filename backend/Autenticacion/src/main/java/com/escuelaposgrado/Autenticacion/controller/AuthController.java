@@ -2,10 +2,10 @@ package com.escuelaposgrado.Autenticacion.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import com.escuelaposgrado.Autenticacion.config.CorsOrigins;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.escuelaposgrado.Autenticacion.controller.support.LoginExceptionTranslator;
 import com.escuelaposgrado.Autenticacion.dto.request.ActualizarPerfilRequest;
 import com.escuelaposgrado.Autenticacion.dto.request.CambiarPasswordRequest;
 import com.escuelaposgrado.Autenticacion.dto.request.GoogleLoginRequest;
@@ -23,6 +24,7 @@ import com.escuelaposgrado.Autenticacion.dto.response.MessageResponse;
 import com.escuelaposgrado.Autenticacion.dto.response.UsuarioResponse;
 import com.escuelaposgrado.Autenticacion.service.AuthService;
 import com.escuelaposgrado.Autenticacion.service.GoogleOAuthService;
+import com.escuelaposgrado.Autenticacion.service.auth.AuthMessages;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,8 +40,8 @@ import jakarta.validation.Valid;
 /**
  * Controlador REST para la autenticación
  */
-@Tag(name = "🔐 Autenticación", description = "Endpoints para autenticación y registro de usuarios")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
+@Tag(name = "Autenticacion", description = "Endpoints para autenticación y registro de usuarios")
+@CrossOrigin(origins = {CorsOrigins.LOCALHOST, CorsOrigins.LOCALHOST_IP}, 
              allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
@@ -47,11 +49,13 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final GoogleOAuthService googleOAuthService;
 
-    @Autowired
-    private GoogleOAuthService googleOAuthService;
+    public AuthController(AuthService authService, GoogleOAuthService googleOAuthService) {
+        this.authService = authService;
+        this.googleOAuthService = googleOAuthService;
+    }
 
     /**
      * Endpoint para login
@@ -59,7 +63,7 @@ public class AuthController {
     @Operation(
             summary = "Iniciar sesión",
             description = "Autentica un usuario y devuelve un token JWT para acceder a los endpoints protegidos",
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -114,21 +118,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error en login para usuario {}: {}", loginRequest.getUsernameOrEmail(), e.getMessage(), e);
-            
-            // Traducir mensajes específicos al español
-            String errorMessage = e.getMessage();
-            if (errorMessage.contains("User account is locked")) {
-                errorMessage = "La cuenta de usuario está desactivada";
-            } else if (errorMessage.contains("Bad credentials")) {
-                errorMessage = "Credenciales incorrectas";
-            } else if (errorMessage.contains("Account disabled")) {
-                errorMessage = "La cuenta está deshabilitada";
-            } else if (errorMessage.contains("Account expired")) {
-                errorMessage = "La cuenta ha expirado";
-            } else if (errorMessage.contains("Credentials expired")) {
-                errorMessage = "Las credenciales han expirado";
-            }
-            
+            String errorMessage = LoginExceptionTranslator.toSpanishMessage(e);
             return ResponseEntity.badRequest().body(new MessageResponse("Error en login: " + errorMessage, false));
         }
     }
@@ -140,7 +130,7 @@ public class AuthController {
             summary = "Registrar nuevo usuario",
             description = "Registra un nuevo usuario en el sistema. Solo accesible para usuarios con rol ADMIN o COORDINADOR. Los campos requeridos varían según el rol seleccionado",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -220,7 +210,7 @@ public class AuthController {
             summary = "Obtener perfil del usuario actual",
             description = "Devuelve la información completa del usuario autenticado actualmente",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -278,7 +268,7 @@ public class AuthController {
             summary = "Validar token JWT",
             description = "Verifica si el token JWT proporcionado es válido y no ha expirado",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -335,7 +325,7 @@ public class AuthController {
     @Operation(
             summary = "Actualizar perfil personal",
             description = "Permite al usuario actualizar su información personal. Solo puede modificar: teléfono, dirección y contraseña. No puede cambiar: rol, username, email, nombres, apellidos, dni, códigos o especialidad.",
-            tags = {"🔐 Autenticación"},
+            tags = {"Autenticacion"},
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
     @ApiResponses(value = {
@@ -419,7 +409,7 @@ public class AuthController {
         } catch (Exception e) {
             logger.error("Error inesperado al actualizar perfil: {}", e.getMessage());
             return ResponseEntity.badRequest().body(
-                new MessageResponse("Error interno del servidor", false)
+                new MessageResponse(AuthMessages.INTERNAL_SERVER_ERROR, false)
             );
         }
     }
@@ -431,7 +421,7 @@ public class AuthController {
             summary = "Cambiar contraseña",
             description = "Permite al usuario autenticado cambiar su contraseña proporcionando la contraseña actual y la nueva contraseña",
             security = @SecurityRequirement(name = "bearerAuth"),
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -525,7 +515,7 @@ public class AuthController {
         } catch (Exception e) {
             logger.error("Error inesperado al cambiar contraseña: {}", e.getMessage());
             return ResponseEntity.badRequest().body(
-                new MessageResponse("Error interno del servidor", false)
+                new MessageResponse(AuthMessages.INTERNAL_SERVER_ERROR, false)
             );
         }
     }
@@ -536,7 +526,7 @@ public class AuthController {
     @Operation(
             summary = "Iniciar sesión con Google",
             description = "Autentica un usuario usando Google OAuth y devuelve un token JWT",
-            tags = {"🔐 Autenticación"}
+            tags = {"Autenticacion"}
     )
     @ApiResponses(value = {
             @ApiResponse(

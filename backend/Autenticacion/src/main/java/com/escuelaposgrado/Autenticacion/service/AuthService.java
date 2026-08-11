@@ -1,11 +1,8 @@
 package com.escuelaposgrado.Autenticacion.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,33 +23,50 @@ import com.escuelaposgrado.Autenticacion.model.entity.Usuario;
 import com.escuelaposgrado.Autenticacion.model.enums.Role;
 import com.escuelaposgrado.Autenticacion.repository.UsuarioRepository;
 import com.escuelaposgrado.Autenticacion.security.jwt.JwtUtils;
+import com.escuelaposgrado.Autenticacion.service.auth.AppClock;
+import com.escuelaposgrado.Autenticacion.service.auth.AuthMessages;
+import com.escuelaposgrado.Autenticacion.service.auth.RoleFieldsData;
+import com.escuelaposgrado.Autenticacion.service.auth.UsuarioDtoMapper;
+import com.escuelaposgrado.Autenticacion.service.auth.UsuarioRoleFieldsApplier;
+import com.escuelaposgrado.Autenticacion.service.auth.UsuarioUniquenessValidator;
 
 /**
- * Servicio para la autenticación y gestión de usuarios
+ * Autenticación, perfil y administración de usuarios.
+ * Validación de unicidad y mapeo delegados a componentes cohesivos.
  */
 @Service
 @Transactional
 public class AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder encoder;
+    private final JwtUtils jwtUtils;
+    private final UsuarioDtoMapper usuarioDtoMapper;
+    private final UsuarioRoleFieldsApplier roleFieldsApplier;
+    private final UsuarioUniquenessValidator uniquenessValidator;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public AuthService(
+            AuthenticationManager authenticationManager,
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder encoder,
+            JwtUtils jwtUtils,
+            UsuarioDtoMapper usuarioDtoMapper,
+            UsuarioRoleFieldsApplier roleFieldsApplier,
+            UsuarioUniquenessValidator uniquenessValidator) {
+        this.authenticationManager = authenticationManager;
+        this.usuarioRepository = usuarioRepository;
+        this.encoder = encoder;
+        this.jwtUtils = jwtUtils;
+        this.usuarioDtoMapper = usuarioDtoMapper;
+        this.roleFieldsApplier = roleFieldsApplier;
+        this.uniquenessValidator = uniquenessValidator;
+    }
 
-    @Autowired
-    private PasswordEncoder encoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    /**
-     * Autenticar usuario y generar token JWT
-     */
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsernameOrEmail(), 
+                loginRequest.getUsernameOrEmail(),
                 loginRequest.getPassword()
             )
         );
@@ -61,34 +75,23 @@ public class AuthService {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         Usuario usuario = (Usuario) authentication.getPrincipal();
-        
-        // Actualizar último acceso
-        usuarioRepository.actualizarUltimoAcceso(usuario.getId(), LocalDateTime.now());
-
-        return mapToAuthResponse(jwt, usuario);
+        usuarioRepository.actualizarUltimoAcceso(usuario.getId(), AppClock.now());
+        return usuarioDtoMapper.toAuthResponse(jwt, usuario);
     }
 
-    /**
-     * Registrar nuevo usuario
-     */
     public MessageResponse registro(RegistroRequest registroRequest) {
-        // Validar si el username ya existe
         if (usuarioRepository.existsByUsername(registroRequest.getUsername())) {
-            return new MessageResponse("Error: El nombre de usuario ya está en uso!", false);
+            return failure(AuthMessages.USERNAME_IN_USE);
         }
-
-        // Validar si el email ya existe
         if (usuarioRepository.existsByEmail(registroRequest.getEmail())) {
-            return new MessageResponse("Error: El email ya está en uso!", false);
+            return failure(AuthMessages.EMAIL_IN_USE);
         }
 
-        // Validar códigos únicos según el rol
-        String validationError = validateUniqueFields(registroRequest);
+        String validationError = uniquenessValidator.validateForRegistro(registroRequest);
         if (validationError != null) {
-            return new MessageResponse("Error: " + validationError, false);
+            return failure("Error: " + validationError);
         }
 
-        // Crear nuevo usuario
         Usuario usuario = new Usuario(
             registroRequest.getUsername(),
             registroRequest.getEmail(),
@@ -98,274 +101,117 @@ public class AuthService {
             registroRequest.getRole()
         );
 
-        // Establecer campos adicionales según el rol
-        setRoleSpecificFields(usuario, registroRequest);
-
-        // Establecer otros campos
+        roleFieldsApplier.apply(usuario, RoleFieldsData.from(registroRequest));
         usuario.setDni(registroRequest.getDni());
         usuario.setTelefono(registroRequest.getTelefono());
         usuario.setDireccion(registroRequest.getDireccion());
 
         usuarioRepository.save(usuario);
-
-        return new MessageResponse("Usuario registrado exitosamente");
+        return success(AuthMessages.USER_REGISTERED);
     }
 
-    /**
-     * Actualizar perfil personal del usuario autenticado
-     */
     public MessageResponse actualizarPerfil(String username, ActualizarPerfilRequest request) {
-        try {
-            // Buscar usuario por username
-            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
-            if (!usuarioOpt.isPresent()) {
-                return new MessageResponse("Error: Usuario no encontrado", false);
-            }
-
-            Usuario usuario = usuarioOpt.get();
-
-            // Validar contraseñas si se está actualizando
-            if (request.isUpdatingPassword() && !request.isPasswordValid()) {
-                return new MessageResponse("Error: Las contraseñas no coinciden", false);
-            }
-
-            // Actualizar campos permitidos
-            if (request.getTelefono() != null) {
-                usuario.setTelefono(request.getTelefono());
-            }
-
-            if (request.getDireccion() != null) {
-                usuario.setDireccion(request.getDireccion());
-            }
-
-            // Actualizar contraseña si se proporciona
-            if (request.isUpdatingPassword()) {
-                usuario.setPassword(encoder.encode(request.getPassword()));
-            }
-
-            // Actualizar fecha de modificación
-            usuario.setFechaActualizacion(LocalDateTime.now());
-
-            // Guardar cambios
-            usuarioRepository.save(usuario);
-
-            return new MessageResponse("Perfil actualizado exitosamente", true);
-
-        } catch (Exception e) {
-            return new MessageResponse("Error interno del servidor: " + e.getMessage(), false);
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
+        if (usuarioOpt.isEmpty()) {
+            return failure(AuthMessages.USER_NOT_FOUND);
         }
+        if (request.isUpdatingPassword() && !request.isPasswordValid()) {
+            return failure(AuthMessages.PASSWORDS_MISMATCH);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        applyOptionalContactFields(usuario, request.getTelefono(), request.getDireccion());
+        if (request.isUpdatingPassword()) {
+            usuario.setPassword(encoder.encode(request.getPassword()));
+        }
+        markUpdated(usuario);
+        usuarioRepository.save(usuario);
+        return success(AuthMessages.PROFILE_UPDATED);
     }
 
-    /**
-     * Cambiar contraseña del usuario autenticado
-     */
     public MessageResponse cambiarPassword(String username, CambiarPasswordRequest request) {
-        try {
-            // Buscar usuario por username
-            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
-            if (!usuarioOpt.isPresent()) {
-                return new MessageResponse("Error: Usuario no encontrado", false);
-            }
-
-            Usuario usuario = usuarioOpt.get();
-
-            // Validar que las nuevas contraseñas coincidan
-            if (!request.isPasswordValid()) {
-                return new MessageResponse("Error: Las nuevas contraseñas no coinciden", false);
-            }
-
-            // Validar que la contraseña actual sea correcta
-            if (!encoder.matches(request.getPasswordActual(), usuario.getPassword())) {
-                return new MessageResponse("Error: La contraseña actual es incorrecta", false);
-            }
-
-            // Validar que la nueva contraseña sea diferente a la actual
-            if (encoder.matches(request.getNuevaPassword(), usuario.getPassword())) {
-                return new MessageResponse("Error: La nueva contraseña debe ser diferente a la actual", false);
-            }
-
-            // Actualizar contraseña
-            usuario.setPassword(encoder.encode(request.getNuevaPassword()));
-            usuario.setFechaActualizacion(LocalDateTime.now());
-
-            // Guardar cambios
-            usuarioRepository.save(usuario);
-
-            return new MessageResponse("Contraseña cambiada exitosamente", true);
-
-        } catch (Exception e) {
-            return new MessageResponse("Error interno del servidor: " + e.getMessage(), false);
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
+        if (usuarioOpt.isEmpty()) {
+            return failure(AuthMessages.USER_NOT_FOUND);
         }
+        if (!request.isPasswordValid()) {
+            return failure(AuthMessages.NEW_PASSWORDS_MISMATCH);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (!encoder.matches(request.getPasswordActual(), usuario.getPassword())) {
+            return failure(AuthMessages.CURRENT_PASSWORD_INVALID);
+        }
+        if (encoder.matches(request.getNuevaPassword(), usuario.getPassword())) {
+            return failure(AuthMessages.NEW_PASSWORD_SAME);
+        }
+
+        usuario.setPassword(encoder.encode(request.getNuevaPassword()));
+        markUpdated(usuario);
+        usuarioRepository.save(usuario);
+        return success(AuthMessages.PASSWORD_CHANGED);
     }
 
-    /**
-     * Obtener información del usuario actual
-     */
     public UsuarioResponse getCurrentUser(String username) {
         Usuario usuario = usuarioRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        return mapToUsuarioResponse(usuario);
+            .orElseThrow(() -> new IllegalArgumentException(AuthMessages.USER_NOT_FOUND_PLAIN));
+        return usuarioDtoMapper.toUsuarioResponse(usuario);
     }
 
-
-
-    /**
-     * Obtener todos los usuarios por rol
-     */
     public List<UsuarioResponse> getUsuariosByRole(Role role) {
-        List<Usuario> usuarios = usuarioRepository.findByRoleAndActivoTrue(role);
-        return usuarios.stream()
-                      .map(this::mapToUsuarioResponse)
-                      .collect(Collectors.toList());
+        return mapUsers(usuarioRepository.findByRoleAndActivoTrue(role));
     }
 
-    /**
-     * Obtener todos los usuarios por rol (incluidos inactivos)
-     */
     public List<UsuarioResponse> getUsuariosByRoleIncluyendoInactivos(Role role) {
-        List<Usuario> usuarios = usuarioRepository.findByRole(role);
-        return usuarios.stream()
-                      .map(this::mapToUsuarioResponse)
-                      .collect(Collectors.toList());
+        return mapUsers(usuarioRepository.findByRole(role));
     }
 
-    /**
-     * Obtener todos los usuarios activos
-     */
     public List<UsuarioResponse> getAllUsuarios() {
-        List<Usuario> usuarios = usuarioRepository.findByActivoTrue();
-        return usuarios.stream()
-                      .map(this::mapToUsuarioResponse)
-                      .collect(Collectors.toList());
+        return mapUsers(usuarioRepository.findByActivoTrue());
     }
 
-    /**
-     * Obtener todos los usuarios (incluidos inactivos)
-     */
     public List<UsuarioResponse> getAllUsuariosIncluyendoInactivos() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        return usuarios.stream()
-                      .map(this::mapToUsuarioResponse)
-                      .collect(Collectors.toList());
+        return mapUsers(usuarioRepository.findAll());
     }
 
-    /**
-     * Buscar usuarios por nombres y apellidos
-     */
     public List<UsuarioResponse> buscarUsuariosPorNombre(String texto) {
         if (texto == null || texto.trim().isEmpty()) {
             return getAllUsuarios();
         }
-        
-        List<Usuario> usuarios = usuarioRepository.buscarPorNombre(texto.trim());
-        return usuarios.stream()
-                      .map(this::mapToUsuarioResponse)
-                      .collect(Collectors.toList());
+        return mapUsers(usuarioRepository.buscarPorNombre(texto.trim()));
     }
 
-    /**
-     * Desactivar usuario
-     */
     public MessageResponse desactivarUsuario(Long id) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
-        if (usuarioOpt.isEmpty()) {
-            return new MessageResponse("Usuario no encontrado", false);
-        }
-
-        Usuario usuario = usuarioOpt.get();
-        usuario.setActivo(false);
-        usuarioRepository.save(usuario);
-
-        return new MessageResponse("Usuario desactivado exitosamente");
+        return setActivo(id, false, AuthMessages.USER_DEACTIVATED);
     }
 
-    /**
-     * Activar usuario
-     */
     public MessageResponse activarUsuario(Long id) {
+        return setActivo(id, true, AuthMessages.USER_ACTIVATED);
+    }
+
+    public MessageResponse actualizarUsuarioAdmin(Long id, ActualizarUsuarioAdminRequest request) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
         if (usuarioOpt.isEmpty()) {
-            return new MessageResponse("Usuario no encontrado", false);
+            return failure(AuthMessages.USER_NOT_FOUND_PLAIN);
         }
 
         Usuario usuario = usuarioOpt.get();
-        usuario.setActivo(true);
-        usuarioRepository.save(usuario);
-
-        return new MessageResponse("Usuario activado exitosamente");
-    }
-
-    /**
-     * Actualizar usuario por administrador
-     */
-    public MessageResponse actualizarUsuarioAdmin(Long id, ActualizarUsuarioAdminRequest request) {
-        try {
-            // Buscar usuario por ID
-            Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
-            if (usuarioOpt.isEmpty()) {
-                return new MessageResponse("Usuario no encontrado", false);
-            }
-
-            Usuario usuario = usuarioOpt.get();
-
-            // Validar que el username y email no estén siendo usados por otro usuario
-            if (!usuario.getUsername().equals(request.getUsername())) {
-                Optional<Usuario> existeUsername = usuarioRepository.findByUsername(request.getUsername());
-                if (existeUsername.isPresent() && !existeUsername.get().getId().equals(id)) {
-                    return new MessageResponse("Error: El nombre de usuario ya está en uso", false);
-                }
-            }
-
-            if (!usuario.getEmail().equals(request.getEmail())) {
-                Optional<Usuario> existeEmail = usuarioRepository.findByEmail(request.getEmail());
-                if (existeEmail.isPresent() && !existeEmail.get().getId().equals(id)) {
-                    return new MessageResponse("Error: El email ya está en uso", false);
-                }
-            }
-
-            // Actualizar campos básicos
-            usuario.setUsername(request.getUsername());
-            usuario.setEmail(request.getEmail());
-            usuario.setNombres(request.getNombres());
-            usuario.setApellidos(request.getApellidos());
-            usuario.setRole(request.getRole());
-
-            // Actualizar campos opcionales
-            if (request.getDni() != null) {
-                usuario.setDni(request.getDni());
-            }
-            if (request.getTelefono() != null) {
-                usuario.setTelefono(request.getTelefono());
-            }
-            if (request.getDireccion() != null) {
-                usuario.setDireccion(request.getDireccion());
-            }
-            
-            // Actualizar campos específicos del rol aplicando la lógica correcta
-            setRoleSpecificFields(usuario, request);
-
-            // Actualizar contraseña si se proporciona
-            if (request.isUpdatingPassword()) {
-                usuario.setPassword(encoder.encode(request.getPassword()));
-            }
-
-            // Actualizar fecha de modificación
-            usuario.setFechaActualizacion(LocalDateTime.now());
-
-            // Guardar cambios
-            usuarioRepository.save(usuario);
-
-            return new MessageResponse("Usuario actualizado exitosamente", true);
-
-        } catch (Exception e) {
-            return new MessageResponse("Error interno del servidor: " + e.getMessage(), false);
+        String uniquenessError = uniquenessValidator.validateAdminUsernameEmail(id, usuario, request);
+        if (uniquenessError != null) {
+            return failure(uniquenessError);
         }
+
+        applyAdminBasicFields(usuario, request);
+        roleFieldsApplier.apply(usuario, RoleFieldsData.from(request));
+        if (request.isUpdatingPassword()) {
+            usuario.setPassword(encoder.encode(request.getPassword()));
+        }
+
+        markUpdated(usuario);
+        usuarioRepository.save(usuario);
+        return success(AuthMessages.USER_UPDATED);
     }
 
-    /**
-     * Obtener estadísticas de usuarios por rol
-     */
     public MessageResponse getEstadisticas() {
         long totalUsuarios = usuarioRepository.count();
         long admins = usuarioRepository.countByRoleAndActivoTrue(Role.ADMIN);
@@ -378,153 +224,54 @@ public class AuthService {
             "Total: %d, Admins: %d, Docentes: %d, Alumnos: %d, Coordinadores: %d, Postulantes: %d",
             totalUsuarios, admins, docentes, alumnos, coordinadores, postulantes
         );
-
-        return new MessageResponse(estadisticas);
+        return success(estadisticas);
     }
 
-    // Métodos auxiliares privados
-
-    private String validateUniqueFields(RegistroRequest request) {
-        // Validar código de estudiante para ALUMNO y POSTULANTE
-        if ((request.getRole() == Role.ALUMNO || request.getRole() == Role.POSTULANTE) 
-            && request.getCodigoEstudiante() != null) {
-            if (usuarioRepository.findByCodigoEstudiante(request.getCodigoEstudiante()).isPresent()) {
-                return "El código de estudiante ya está en uso!";
-            }
+    private MessageResponse setActivo(Long id, boolean activo, String successMessage) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isEmpty()) {
+            return failure(AuthMessages.USER_NOT_FOUND_PLAIN);
         }
-
-        // Validar código de docente para DOCENTE y COORDINADOR
-        if ((request.getRole() == Role.DOCENTE || request.getRole() == Role.COORDINADOR) 
-            && request.getCodigoDocente() != null) {
-            if (usuarioRepository.findByCodigoDocente(request.getCodigoDocente()).isPresent()) {
-                return "El código de docente ya está en uso!";
-            }
-        }
-
-        // Validar DNI si se proporciona
-        if (request.getDni() != null && !request.getDni().trim().isEmpty()) {
-            if (usuarioRepository.findByDni(request.getDni()).isPresent()) {
-                return "El DNI ya está registrado!";
-            }
-        }
-
-        return null;
+        Usuario usuario = usuarioOpt.get();
+        usuario.setActivo(activo);
+        usuarioRepository.save(usuario);
+        return success(successMessage);
     }
 
-    private void setRoleSpecificFields(Usuario usuario, RegistroRequest request) {
-        // Inicializar todos los campos específicos de rol como null
-        usuario.setCodigoEstudiante(null);
-        usuario.setCodigoDocente(null);
-        usuario.setEspecialidad(null);
-        usuario.setProgramaInteres(null);
-        
-        switch (request.getRole()) {
-            case ALUMNO:
-            case POSTULANTE:
-                // Solo establecer codigo_estudiante si no está vacío
-                if (request.getCodigoEstudiante() != null && !request.getCodigoEstudiante().trim().isEmpty()) {
-                    usuario.setCodigoEstudiante(request.getCodigoEstudiante().trim());
-                }
-                if (request.getRole() == Role.POSTULANTE) {
-                    if (request.getProgramaInteres() != null && !request.getProgramaInteres().trim().isEmpty()) {
-                        usuario.setProgramaInteres(request.getProgramaInteres().trim());
-                    }
-                }
-                break;
-            case DOCENTE:
-            case COORDINADOR:
-                // Solo establecer codigo_docente si no está vacío
-                if (request.getCodigoDocente() != null && !request.getCodigoDocente().trim().isEmpty()) {
-                    usuario.setCodigoDocente(request.getCodigoDocente().trim());
-                }
-                if (request.getEspecialidad() != null && !request.getEspecialidad().trim().isEmpty()) {
-                    usuario.setEspecialidad(request.getEspecialidad().trim());
-                }
-                break;
-            case ADMIN:
-                // Admin no necesita campos adicionales, todos quedan como null
-                break;
+    private void applyAdminBasicFields(Usuario usuario, ActualizarUsuarioAdminRequest request) {
+        usuario.setUsername(request.getUsername());
+        usuario.setEmail(request.getEmail());
+        usuario.setNombres(request.getNombres());
+        usuario.setApellidos(request.getApellidos());
+        usuario.setRole(request.getRole());
+        if (request.getDni() != null) {
+            usuario.setDni(request.getDni());
+        }
+        applyOptionalContactFields(usuario, request.getTelefono(), request.getDireccion());
+    }
+
+    private void applyOptionalContactFields(Usuario usuario, String telefono, String direccion) {
+        if (telefono != null) {
+            usuario.setTelefono(telefono);
+        }
+        if (direccion != null) {
+            usuario.setDireccion(direccion);
         }
     }
 
-    // Método sobrecargado para ActualizarUsuarioAdminRequest
-    private void setRoleSpecificFields(Usuario usuario, ActualizarUsuarioAdminRequest request) {
-        // Inicializar todos los campos específicos de rol como null
-        usuario.setCodigoEstudiante(null);
-        usuario.setCodigoDocente(null);
-        usuario.setEspecialidad(null);
-        usuario.setProgramaInteres(null);
-        
-        switch (request.getRole()) {
-            case ALUMNO:
-            case POSTULANTE:
-                // Solo establecer codigo_estudiante si no está vacío
-                if (request.getCodigoEstudiante() != null && !request.getCodigoEstudiante().trim().isEmpty()) {
-                    usuario.setCodigoEstudiante(request.getCodigoEstudiante().trim());
-                }
-                if (request.getRole() == Role.POSTULANTE) {
-                    if (request.getProgramaInteres() != null && !request.getProgramaInteres().trim().isEmpty()) {
-                        usuario.setProgramaInteres(request.getProgramaInteres().trim());
-                    }
-                }
-                break;
-            case DOCENTE:
-            case COORDINADOR:
-                // Solo establecer codigo_docente si no está vacío
-                if (request.getCodigoDocente() != null && !request.getCodigoDocente().trim().isEmpty()) {
-                    usuario.setCodigoDocente(request.getCodigoDocente().trim());
-                }
-                if (request.getEspecialidad() != null && !request.getEspecialidad().trim().isEmpty()) {
-                    usuario.setEspecialidad(request.getEspecialidad().trim());
-                }
-                break;
-            case ADMIN:
-                // Admin no necesita campos adicionales, todos quedan como null
-                break;
-        }
+    private List<UsuarioResponse> mapUsers(List<Usuario> usuarios) {
+        return usuarios.stream().map(usuarioDtoMapper::toUsuarioResponse).toList();
     }
 
-    private AuthResponse mapToAuthResponse(String jwt, Usuario usuario) {
-        AuthResponse response = new AuthResponse(
-            jwt, 
-            usuario.getId(), 
-            usuario.getUsername(), 
-            usuario.getEmail(),
-            usuario.getNombres(), 
-            usuario.getApellidos(), 
-            usuario.getRole()
-        );
-        response.setDni(usuario.getDni());
-        response.setTelefono(usuario.getTelefono());
-        response.setDireccion(usuario.getDireccion());
-        response.setUltimoAcceso(usuario.getUltimoAcceso());
-        response.setCodigoEstudiante(usuario.getCodigoEstudiante());
-        response.setCodigoDocente(usuario.getCodigoDocente());
-        response.setEspecialidad(usuario.getEspecialidad());
-        response.setProgramaInteres(usuario.getProgramaInteres());
-        
-        return response;
+    private void markUpdated(Usuario usuario) {
+        usuario.setFechaActualizacion(AppClock.now());
     }
 
-    private UsuarioResponse mapToUsuarioResponse(Usuario usuario) {
-        UsuarioResponse response = new UsuarioResponse();
-        response.setId(usuario.getId());
-        response.setUsername(usuario.getUsername());
-        response.setEmail(usuario.getEmail());
-        response.setNombres(usuario.getNombres());
-        response.setApellidos(usuario.getApellidos());
-        response.setDni(usuario.getDni());
-        response.setTelefono(usuario.getTelefono());
-        response.setDireccion(usuario.getDireccion());
-        response.setRole(usuario.getRole());
-        response.setActivo(usuario.getActivo());
-        response.setFechaCreacion(usuario.getFechaCreacion());
-        response.setUltimoAcceso(usuario.getUltimoAcceso());
-        response.setCodigoEstudiante(usuario.getCodigoEstudiante());
-        response.setCodigoDocente(usuario.getCodigoDocente());
-        response.setEspecialidad(usuario.getEspecialidad());
-        response.setProgramaInteres(usuario.getProgramaInteres());
-        
-        return response;
+    private MessageResponse success(String message) {
+        return new MessageResponse(message, true);
+    }
+
+    private MessageResponse failure(String message) {
+        return new MessageResponse(message, false);
     }
 }

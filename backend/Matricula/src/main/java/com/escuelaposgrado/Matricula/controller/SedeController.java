@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +35,11 @@ import jakarta.validation.Valid;
 @Tag(name = "Sedes", description = "API para gestionar sedes")
 public class SedeController {
 
-    @Autowired
-    private SedeService sedeService;
+    private final SedeService sedeService;
+
+    public SedeController(SedeService sedeService) {
+        this.sedeService = sedeService;
+    }
 
     /**
      * Obtener todas las sedes

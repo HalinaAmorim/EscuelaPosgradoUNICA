@@ -1,21 +1,22 @@
 package com.escuelaposgrado.Matricula.service;
 
-import com.escuelaposgrado.Matricula.model.entity.Aula;
-import com.escuelaposgrado.Matricula.model.entity.Sede;
-import com.escuelaposgrado.Matricula.dto.request.AulaRequest;
-import com.escuelaposgrado.Matricula.dto.response.AulaResponse;
-import com.escuelaposgrado.Matricula.dto.response.nested.SedeBasicResponse;
-import com.escuelaposgrado.Matricula.repository.AulaRepository;
-import com.escuelaposgrado.Matricula.repository.SedeRepository;
-import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
-import com.escuelaposgrado.Matricula.exception.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
+import com.escuelaposgrado.Matricula.dto.request.AulaRequest;
+import com.escuelaposgrado.Matricula.dto.response.AulaResponse;
+import com.escuelaposgrado.Matricula.dto.response.nested.SedeBasicResponse;
+import com.escuelaposgrado.Matricula.exception.BadRequestException;
+import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
+import com.escuelaposgrado.Matricula.model.entity.Aula;
+import com.escuelaposgrado.Matricula.model.entity.Sede;
+import com.escuelaposgrado.Matricula.repository.AulaRepository;
+import com.escuelaposgrado.Matricula.repository.SedeRepository;
 
 /**
  * Servicio para gestionar las operaciones CRUD de Aulas
@@ -24,185 +25,132 @@ import java.util.Optional;
 @Transactional
 public class AulaService {
 
-    @Autowired
-    private AulaRepository aulaRepository;
+    private static final String MSG_AULA_NO_ENCONTRADA = "Aula no encontrada con ID: ";
+    private static final String MSG_SEDE_NO_ENCONTRADA = "Sede no encontrada con ID: ";
+    private static final String MSG_CODIGO_DUPLICADO_EN_SEDE = "Ya existe un aula con el código ";
 
-    @Autowired
-    private SedeRepository sedeRepository;
+    private final AulaRepository aulaRepository;
+    private final SedeRepository sedeRepository;
 
-    /**
-     * Obtener todas las aulas
-     */
+    public AulaService(AulaRepository aulaRepository, SedeRepository sedeRepository) {
+        this.aulaRepository = aulaRepository;
+        this.sedeRepository = sedeRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<AulaResponse> findAll() {
-        List<Aula> aulas = aulaRepository.findAll();
-        return aulas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(aulaRepository.findAll());
     }
 
-    /**
-     * Obtener todas las aulas activas
-     */
     @Transactional(readOnly = true)
     public List<AulaResponse> findAllActive() {
-        List<Aula> aulas = aulaRepository.findByActivoTrueOrderByNombreAsc();
-        return aulas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(aulaRepository.findByActivoTrueOrderByNombreAsc());
     }
 
-    /**
-     * Obtener aulas por sede
-     */
     @Transactional(readOnly = true)
     public List<AulaResponse> findBySedeId(Long sedeId) {
-        List<Aula> aulas = aulaRepository.findBySedeIdAndActivoTrueOrderByNombreAsc(sedeId);
-        return aulas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(aulaRepository.findBySedeIdAndActivoTrueOrderByNombreAsc(sedeId));
     }
 
-    /**
-     * Obtener aulas activas por sede
-     */
     @Transactional(readOnly = true)
     public List<AulaResponse> findActiveBySedeId(Long sedeId) {
-        List<Aula> aulas = aulaRepository.findBySedeIdAndActivoTrueOrderByNombreAsc(sedeId);
-        return aulas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(aulaRepository.findBySedeIdAndActivoTrueOrderByNombreAsc(sedeId));
     }
 
-    /**
-     * Obtener aula por ID
-     */
     @Transactional(readOnly = true)
     public AulaResponse findById(Long id) {
-        Aula aula = aulaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aula no encontrada con ID: " + id));
-        return convertToResponse(aula);
+        return convertToResponse(findAulaOrThrow(id));
     }
 
-    /**
-     * Crear nueva aula
-     */
     public AulaResponse create(AulaRequest request) {
-        // Validar que la sede existe y está activa
-        Sede sede = sedeRepository.findById(request.getSedeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + request.getSedeId()));
-        
-        if (!sede.getActivo()) {
-            throw new BadRequestException("No se puede crear el aula en una sede inactiva");
-        }
-
-        // Validar que no existe otra aula con el mismo código en la misma sede
-        Optional<Aula> aulaExistentePorCodigo = aulaRepository.findByCodigo(request.getCodigo());
-        if (aulaExistentePorCodigo.isPresent() && aulaExistentePorCodigo.get().getSede().getId().equals(request.getSedeId())) {
-            throw new BadRequestException("Ya existe un aula con el código " + request.getCodigo() + " en esta sede");
-        }
+        Sede sede = resolveActiveSede(request.getSedeId(), "No se puede crear el aula en una sede inactiva");
+        assertUniqueCodigoEnSede(request.getCodigo(), request.getSedeId(), null);
 
         Aula aula = new Aula();
-        aula.setNombre(request.getNombre());
-        aula.setCodigo(request.getCodigo());
-        aula.setCapacidad(request.getCapacidad());
-        aula.setTipo(request.getTipo());
-        aula.setEquipamiento(request.getEquipamiento());
-        aula.setDescripcion(request.getDescripcion());
-        aula.setSede(sede);
+        applyRequestData(aula, request, sede);
         aula.setActivo(true);
 
-        Aula savedAula = aulaRepository.save(aula);
-        return convertToResponse(savedAula);
+        return convertToResponse(aulaRepository.save(aula));
     }
 
-    /**
-     * Actualizar aula existente
-     */
     public AulaResponse update(Long id, AulaRequest request) {
-        Aula aula = aulaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aula no encontrada con ID: " + id));
+        Aula aula = findAulaOrThrow(id);
+        Sede sede = resolveActiveSede(request.getSedeId(), "No se puede asignar el aula a una sede inactiva");
+        assertUniqueCodigoEnSede(request.getCodigo(), request.getSedeId(), id);
 
-        // Validar que la sede existe y está activa
-        Sede sede = sedeRepository.findById(request.getSedeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + request.getSedeId()));
-        
-        if (!sede.getActivo()) {
-            throw new BadRequestException("No se puede asignar el aula a una sede inactiva");
-        }
-
-        // Validar que no existe otra aula con el mismo código en la misma sede (excluyendo la actual)
-        Optional<Aula> aulaExistentePorCodigo = aulaRepository.findByCodigo(request.getCodigo());
-        if (aulaExistentePorCodigo.isPresent() && 
-            aulaExistentePorCodigo.get().getSede().getId().equals(request.getSedeId()) &&
-            !aulaExistentePorCodigo.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe un aula con el código " + request.getCodigo() + " en esta sede");
-        }
-
-        aula.setNombre(request.getNombre());
-        aula.setCodigo(request.getCodigo());
-        aula.setCapacidad(request.getCapacidad());
-        aula.setTipo(request.getTipo());
-        aula.setEquipamiento(request.getEquipamiento());
-        aula.setDescripcion(request.getDescripcion());
-        aula.setSede(sede);
-
-        Aula updatedAula = aulaRepository.save(aula);
-        return convertToResponse(updatedAula);
+        applyRequestData(aula, request, sede);
+        return convertToResponse(aulaRepository.save(aula));
     }
 
-    /**
-     * Activar/desactivar aula
-     */
     public AulaResponse toggleActive(Long id) {
-        Aula aula = aulaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aula no encontrada con ID: " + id));
-
+        Aula aula = findAulaOrThrow(id);
         aula.setActivo(!aula.getActivo());
-        Aula updatedAula = aulaRepository.save(aula);
-        return convertToResponse(updatedAula);
+        return convertToResponse(aulaRepository.save(aula));
     }
 
-    /**
-     * Eliminar aula (borrado lógico)
-     */
     public void delete(Long id) {
-        Aula aula = aulaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aula no encontrada con ID: " + id));
-
+        Aula aula = findAulaOrThrow(id);
         aula.setActivo(false);
         aulaRepository.save(aula);
     }
 
-    /**
-     * Buscar aulas por nombre
-     */
     @Transactional(readOnly = true)
     public List<AulaResponse> findByNombreContaining(String nombre) {
-        // Como no existe el método exacto, usar findAll y filtrar
-        List<Aula> todasLasAulas = aulaRepository.findAll();
-        List<Aula> aulas = todasLasAulas.stream()
-                .filter(aula -> aula.getNombre().toLowerCase().contains(nombre.toLowerCase()) && aula.getActivo())
-                .collect(Collectors.toList());
-        return aulas.stream()
+        String nombreLower = nombre.toLowerCase();
+        return aulaRepository.findAll().stream()
+                .filter(aula -> aula.getNombre().toLowerCase().contains(nombreLower) && aula.getActivo())
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    /**
-     * Obtener aulas por capacidad mínima
-     */
     @Transactional(readOnly = true)
     public List<AulaResponse> findByCapacidadMinima(Integer capacidadMinima) {
-        List<Aula> aulas = aulaRepository.findByCapacidadGreaterThanEqualAndActivoTrueOrderByCapacidadAsc(capacidadMinima);
-        return aulas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(aulaRepository.findByCapacidadGreaterThanEqualAndActivoTrueOrderByCapacidadAsc(capacidadMinima));
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private Sede resolveActiveSede(Long sedeId, String inactiveMessage) {
+        Sede sede = sedeRepository.findById(sedeId)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_SEDE_NO_ENCONTRADA + sedeId));
+        if (!sede.getActivo()) {
+            throw new BadRequestException(inactiveMessage);
+        }
+        return sede;
+    }
+
+    private void assertUniqueCodigoEnSede(String codigo, Long sedeId, Long excludeId) {
+        Optional<Aula> existing = aulaRepository.findByCodigo(codigo);
+        if (existing.isEmpty()) {
+            return;
+        }
+        Aula aula = existing.get();
+        boolean sameSede = aula.getSede().getId().equals(sedeId);
+        boolean isOther = excludeId == null || !aula.getId().equals(excludeId);
+        if (sameSede && isOther) {
+            throw new BadRequestException(MSG_CODIGO_DUPLICADO_EN_SEDE + codigo + " en esta sede");
+        }
+    }
+
+    private void applyRequestData(Aula aula, AulaRequest request, Sede sede) {
+        aula.setNombre(request.getNombre());
+        aula.setCodigo(request.getCodigo());
+        aula.setCapacidad(request.getCapacidad());
+        aula.setTipo(request.getTipo());
+        aula.setEquipamiento(request.getEquipamiento());
+        aula.setDescripcion(request.getDescripcion());
+        aula.setSede(sede);
+    }
+
+    private Aula findAulaOrThrow(Long id) {
+        return aulaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_AULA_NO_ENCONTRADA + id));
+    }
+
+    private List<AulaResponse> mapAll(List<Aula> aulas) {
+        return aulas.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private AulaResponse convertToResponse(Aula aula) {
         AulaResponse response = new AulaResponse();
         response.setId(aula.getId());
@@ -215,16 +163,18 @@ public class AulaService {
         response.setActivo(aula.getActivo());
         response.setFechaCreacion(aula.getFechaCreacion());
         response.setFechaActualizacion(aula.getFechaActualizacion());
-
-        // Convertir información de la sede
-        if (aula.getSede() != null) {
-            SedeBasicResponse sedeBasic = new SedeBasicResponse();
-            sedeBasic.setId(aula.getSede().getId());
-            sedeBasic.setNombre(aula.getSede().getNombre());
-            sedeBasic.setCodigo(aula.getSede().getCodigo());
-            response.setSede(sedeBasic);
-        }
-
+        response.setSede(toSedeBasic(aula.getSede()));
         return response;
+    }
+
+    private SedeBasicResponse toSedeBasic(Sede sede) {
+        if (sede == null) {
+            return null;
+        }
+        SedeBasicResponse sedeBasic = new SedeBasicResponse();
+        sedeBasic.setId(sede.getId());
+        sedeBasic.setNombre(sede.getNombre());
+        sedeBasic.setCodigo(sede.getCodigo());
+        return sedeBasic;
     }
 }

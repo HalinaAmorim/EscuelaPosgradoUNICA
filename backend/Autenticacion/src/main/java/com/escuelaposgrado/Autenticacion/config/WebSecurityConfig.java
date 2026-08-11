@@ -1,8 +1,9 @@
 package com.escuelaposgrado.Autenticacion.config;
 
-import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,25 +23,37 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.escuelaposgrado.Autenticacion.security.jwt.AuthEntryPointJwt;
 import com.escuelaposgrado.Autenticacion.security.jwt.AuthTokenFilter;
+import com.escuelaposgrado.Autenticacion.security.jwt.JwtUtils;
 import com.escuelaposgrado.Autenticacion.security.services.UserDetailsServiceImpl;
 
 /**
- * Configuración de seguridad para el microservicio de autenticación
+ * Seguridad JWT stateless del microservicio de autenticación.
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private static final List<String> CORS_ORIGINS = List.of(
+            CorsOrigins.LOCALHOST,
+            CorsOrigins.LOCALHOST_IP);
 
-    @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthEntryPointJwt unauthorizedHandler;
+    private final JwtUtils jwtUtils;
+
+    public WebSecurityConfig(
+            UserDetailsServiceImpl userDetailsService,
+            AuthEntryPointJwt unauthorizedHandler,
+            JwtUtils jwtUtils) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtUtils = jwtUtils;
+    }
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+        return new AuthTokenFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
@@ -69,53 +82,38 @@ public class WebSecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                // Endpoints públicos
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/google-login").permitAll()
-                .requestMatchers("/api/health/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                
-                // Swagger/OpenAPI endpoints
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/webjars/**").permitAll()
-                
-                // Endpoint de registro restringido a ADMIN y COORDINADOR
+                .requestMatchers("/api/auth/login", "/api/auth/google-login").permitAll()
+                .requestMatchers("/api/health/**", "/actuator/**", "/error").permitAll()
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**").permitAll()
                 .requestMatchers("/api/auth/registro").hasAnyRole("ADMIN", "COORDINADOR")
-                
-                // Endpoints para diferentes roles
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/docente/**").hasAnyRole("DOCENTE", "COORDINADOR", "ADMIN")
                 .requestMatchers("/api/alumno/**").hasAnyRole("ALUMNO", "ADMIN")
                 .requestMatchers("/api/coordinador/**").hasAnyRole("COORDINADOR", "ADMIN")
                 .requestMatchers("/api/postulante/**").hasAnyRole("POSTULANTE", "ADMIN")
-                
-                // Resto de endpoints requieren autenticación
                 .anyRequest().authenticated()
             );
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Permitir orígenes específicos (frontend en desarrollo y producción)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+        configuration.setAllowedOrigins(CORS_ORIGINS);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
         return source;
     }
 }

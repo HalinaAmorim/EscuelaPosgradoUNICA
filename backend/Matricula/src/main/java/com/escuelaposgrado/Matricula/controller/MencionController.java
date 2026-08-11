@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +34,11 @@ import jakarta.validation.Valid;
 @Tag(name = "Menciones", description = "API para gestionar menciones de programas de estudio")
 public class MencionController {
 
-    @Autowired
-    private MencionService mencionService;
+    private final MencionService mencionService;
+
+    public MencionController(MencionService mencionService) {
+        this.mencionService = mencionService;
+    }
 
     /**
      * Obtener todas las menciones

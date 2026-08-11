@@ -1,10 +1,11 @@
 package com.escuelaposgrado.Matricula.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,186 +26,132 @@ import com.escuelaposgrado.Matricula.repository.TasaPagoRepository;
 @Transactional
 public class TasaPagoService {
 
-    @Autowired
-    private TasaPagoRepository tasaPagoRepository;
+    private static final String MSG_TASA_NO_ENCONTRADA = "Tasa de pago no encontrada con ID: ";
+    private static final String MSG_PROGRAMA_NO_ENCONTRADO = "Programa de estudio no encontrado con ID: ";
+    private static final String MSG_CODIGO_DUPLICADO = "Ya existe una tasa de pago con el código: ";
+    private static final String DEFAULT_MONEDA = "PEN";
 
-    @Autowired
-    private ProgramaEstudioRepository programaEstudioRepository;
+    private final TasaPagoRepository tasaPagoRepository;
+    private final ProgramaEstudioRepository programaEstudioRepository;
 
-    /**
-     * Obtener todas las tasas de pago
-     */
+    public TasaPagoService(TasaPagoRepository tasaPagoRepository,
+                           ProgramaEstudioRepository programaEstudioRepository) {
+        this.tasaPagoRepository = tasaPagoRepository;
+        this.programaEstudioRepository = programaEstudioRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> findAll() {
-        List<TasaPago> tasas = tasaPagoRepository.findByActivoTrueOrderByConceptoAsc();
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByActivoTrueOrderByConceptoAsc());
     }
 
-    /**
-     * Obtener todas las tasas activas
-     */
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> findAllActive() {
-        List<TasaPago> tasas = tasaPagoRepository.findByActivoTrueOrderByConceptoAsc();
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByActivoTrueOrderByConceptoAsc());
     }
 
-    /**
-     * Obtener todas las tasas obligatorias
-     */
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> findAllObligatory() {
-        List<TasaPago> tasas = tasaPagoRepository.findByObligatorioTrueAndActivoTrueOrderByConceptoAsc();
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByObligatorioTrueAndActivoTrueOrderByConceptoAsc());
     }
 
-    /**
-     * Obtener tasas por programa de estudio
-     */
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> findByProgramaEstudioId(Long programaEstudioId) {
-        List<TasaPago> tasas = tasaPagoRepository.findByProgramaEstudioIdAndActivoTrueOrderByConceptoAsc(programaEstudioId);
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByProgramaEstudioIdAndActivoTrueOrderByConceptoAsc(programaEstudioId));
     }
 
-    /**
-     * Obtener tasas por tipo
-     */
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> findByTipo(String tipo) {
-        List<TasaPago> tasas = tasaPagoRepository.findByTipoIgnoreCaseAndActivoTrueOrderByConceptoAsc(tipo);
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByTipoIgnoreCaseAndActivoTrueOrderByConceptoAsc(tipo));
     }
 
-    /**
-     * Obtener tipos de tasas distintos
-     */
     @Transactional(readOnly = true)
     public List<String> findDistinctTipos() {
         return tasaPagoRepository.findDistinctTipos();
     }
 
-    /**
-     * Buscar tasas por concepto
-     */
     @Transactional(readOnly = true)
     public List<TasaPagoResponse> searchByConcepto(String concepto) {
-        List<TasaPago> tasas = tasaPagoRepository.findByConceptoIgnoreCaseContainingAndActivoTrueOrderByConceptoAsc(concepto);
-        return tasas.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(tasaPagoRepository.findByConceptoIgnoreCaseContainingAndActivoTrueOrderByConceptoAsc(concepto));
     }
 
-    /**
-     * Obtener tasa por ID
-     */
     @Transactional(readOnly = true)
     public TasaPagoResponse findById(Long id) {
-        TasaPago tasa = tasaPagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tasa de pago no encontrada con ID: " + id));
-        return convertToResponse(tasa);
+        return convertToResponse(findTasaOrThrow(id));
     }
 
-    /**
-     * Crear nueva tasa de pago
-     */
     public TasaPagoResponse create(TasaPagoRequest request) {
-        // Validar que no exista otra tasa con el mismo código
-        Optional<TasaPago> existingTasa = tasaPagoRepository.findByCodigo(request.getCodigo());
-        if (existingTasa.isPresent()) {
-            throw new BadRequestException("Ya existe una tasa de pago con el código: " + request.getCodigo());
-        }
+        assertUniqueCodigo(request.getCodigo(), null);
+        ProgramaEstudio programa = findProgramaOrThrow(request.getProgramaEstudioId());
 
-        // Validar que existe el programa de estudio
-        ProgramaEstudio programa = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-
-        // Crear nueva tasa
         TasaPago tasa = new TasaPago();
-        tasa.setConcepto(request.getConcepto());
-        tasa.setCodigo(request.getCodigo());
-        tasa.setMonto(request.getMonto());
-        tasa.setMoneda(request.getMoneda() != null ? request.getMoneda() : "PEN");
-        tasa.setTipo(request.getTipo());
-        tasa.setObligatorio(request.getObligatorio() != null ? request.getObligatorio() : false);
-        tasa.setDescripcion(request.getDescripcion());
-        tasa.setFechaVigenciaInicio(request.getFechaVigenciaInicio());
-        tasa.setFechaVigenciaFin(request.getFechaVigenciaFin());
-        tasa.setProgramaEstudio(programa);
+        applyRequestData(tasa, request, programa);
         tasa.setActivo(true);
 
-        TasaPago savedTasa = tasaPagoRepository.save(tasa);
-        return convertToResponse(savedTasa);
+        return convertToResponse(tasaPagoRepository.save(tasa));
     }
 
-    /**
-     * Actualizar tasa existente
-     */
     public TasaPagoResponse update(Long id, TasaPagoRequest request) {
-        TasaPago tasa = tasaPagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tasa de pago no encontrada con ID: " + id));
+        TasaPago tasa = findTasaOrThrow(id);
+        assertUniqueCodigo(request.getCodigo(), id);
+        ProgramaEstudio programa = findProgramaOrThrow(request.getProgramaEstudioId());
 
-        // Validar código único (excepto para la misma tasa)
-        Optional<TasaPago> existingTasa = tasaPagoRepository.findByCodigo(request.getCodigo());
-        if (existingTasa.isPresent() && !existingTasa.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una tasa de pago con el código: " + request.getCodigo());
-        }
-
-        // Validar que existe el programa de estudio
-        ProgramaEstudio programa = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-
-        // Actualizar campos
-        tasa.setConcepto(request.getConcepto());
-        tasa.setCodigo(request.getCodigo());
-        tasa.setMonto(request.getMonto());
-        tasa.setMoneda(request.getMoneda() != null ? request.getMoneda() : "PEN");
-        tasa.setTipo(request.getTipo());
-        tasa.setObligatorio(request.getObligatorio() != null ? request.getObligatorio() : false);
-        tasa.setDescripcion(request.getDescripcion());
-        tasa.setFechaVigenciaInicio(request.getFechaVigenciaInicio());
-        tasa.setFechaVigenciaFin(request.getFechaVigenciaFin());
-        tasa.setProgramaEstudio(programa);
-
-        TasaPago updatedTasa = tasaPagoRepository.save(tasa);
-        return convertToResponse(updatedTasa);
+        applyRequestData(tasa, request, programa);
+        return convertToResponse(tasaPagoRepository.save(tasa));
     }
 
-    /**
-     * Alternar estado activo/inactivo
-     */
     public void toggleActive(Long id) {
-        TasaPago tasa = tasaPagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tasa de pago no encontrada con ID: " + id));
-        
+        TasaPago tasa = findTasaOrThrow(id);
         tasa.setActivo(!tasa.getActivo());
         tasaPagoRepository.save(tasa);
     }
 
-    /**
-     * Eliminar tasa (soft delete)
-     */
     public void delete(Long id) {
-        TasaPago tasa = tasaPagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tasa de pago no encontrada con ID: " + id));
-        
+        TasaPago tasa = findTasaOrThrow(id);
         tasa.setActivo(false);
         tasaPagoRepository.save(tasa);
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private void assertUniqueCodigo(String codigo, Long excludeId) {
+        assertNotTaken(tasaPagoRepository.findByCodigo(codigo), excludeId, MSG_CODIGO_DUPLICADO + codigo);
+    }
+
+    private void assertNotTaken(Optional<TasaPago> existing, Long excludeId, String message) {
+        Predicate<TasaPago> isOther = tasa -> excludeId == null || !tasa.getId().equals(excludeId);
+        if (existing.filter(isOther).isPresent()) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    private void applyRequestData(TasaPago tasa, TasaPagoRequest request, ProgramaEstudio programa) {
+        tasa.setConcepto(request.getConcepto());
+        tasa.setCodigo(request.getCodigo());
+        tasa.setMonto(request.getMonto());
+        tasa.setMoneda(request.getMoneda() != null ? request.getMoneda() : DEFAULT_MONEDA);
+        tasa.setTipo(request.getTipo());
+        tasa.setObligatorio(request.getObligatorio() != null ? request.getObligatorio() : false);
+        tasa.setDescripcion(request.getDescripcion());
+        tasa.setFechaVigenciaInicio(request.getFechaVigenciaInicio());
+        tasa.setFechaVigenciaFin(request.getFechaVigenciaFin());
+        tasa.setProgramaEstudio(programa);
+    }
+
+    private TasaPago findTasaOrThrow(Long id) {
+        return tasaPagoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_TASA_NO_ENCONTRADA + id));
+    }
+
+    private ProgramaEstudio findProgramaOrThrow(Long programaEstudioId) {
+        return programaEstudioRepository.findById(programaEstudioId)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_PROGRAMA_NO_ENCONTRADO + programaEstudioId));
+    }
+
+    private List<TasaPagoResponse> mapAll(List<TasaPago> tasas) {
+        return tasas.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private TasaPagoResponse convertToResponse(TasaPago tasa) {
         TasaPagoResponse response = new TasaPagoResponse();
         response.setId(tasa.getId());
@@ -220,16 +167,18 @@ public class TasaPagoService {
         response.setFechaVigenciaFin(tasa.getFechaVigenciaFin());
         response.setFechaCreacion(tasa.getFechaCreacion());
         response.setFechaActualizacion(tasa.getFechaActualizacion());
-
-        // Convertir programa de estudio
-        if (tasa.getProgramaEstudio() != null) {
-            ProgramaEstudioBasicResponse programaResponse = new ProgramaEstudioBasicResponse();
-            programaResponse.setId(tasa.getProgramaEstudio().getId());
-            programaResponse.setNombre(tasa.getProgramaEstudio().getNombre());
-            programaResponse.setCodigo(tasa.getProgramaEstudio().getCodigo());
-            response.setProgramaEstudio(programaResponse);
-        }
-
+        response.setProgramaEstudio(toProgramaBasic(tasa.getProgramaEstudio()));
         return response;
+    }
+
+    private ProgramaEstudioBasicResponse toProgramaBasic(ProgramaEstudio programa) {
+        if (programa == null) {
+            return null;
+        }
+        ProgramaEstudioBasicResponse programaResponse = new ProgramaEstudioBasicResponse();
+        programaResponse.setId(programa.getId());
+        programaResponse.setNombre(programa.getNombre());
+        programaResponse.setCodigo(programa.getCodigo());
+        return programaResponse;
     }
 }

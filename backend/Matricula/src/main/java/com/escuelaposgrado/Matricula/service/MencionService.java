@@ -1,10 +1,11 @@
 package com.escuelaposgrado.Matricula.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,179 +26,130 @@ import com.escuelaposgrado.Matricula.repository.ProgramaEstudioRepository;
 @Transactional
 public class MencionService {
 
-    @Autowired
-    private MencionRepository mencionRepository;
+    private static final String MSG_MENCION_NO_ENCONTRADA = "Mención no encontrada con ID: ";
+    private static final String MSG_PROGRAMA_NO_ENCONTRADO = "Programa de estudio no encontrado con ID: ";
+    private static final String MSG_NOMBRE_DUPLICADO = "Ya existe una mención con el nombre: ";
+    private static final String MSG_CODIGO_DUPLICADO = "Ya existe una mención con el código: ";
 
-    @Autowired
-    private ProgramaEstudioRepository programaEstudioRepository;
+    private final MencionRepository mencionRepository;
+    private final ProgramaEstudioRepository programaEstudioRepository;
 
-    /**
-     * Obtener todas las menciones
-     */
+    public MencionService(MencionRepository mencionRepository,
+                          ProgramaEstudioRepository programaEstudioRepository) {
+        this.mencionRepository = mencionRepository;
+        this.programaEstudioRepository = programaEstudioRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<MencionResponse> findAll() {
-        List<Mencion> menciones = mencionRepository.findAll();
-        return menciones.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(mencionRepository.findAll());
     }
 
-    /**
-     * Obtener todas las menciones activas
-     */
     @Transactional(readOnly = true)
     public List<MencionResponse> findAllActive() {
-        List<Mencion> menciones = mencionRepository.findByActivoTrueOrderByNombreAsc();
-        return menciones.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(mencionRepository.findByActivoTrueOrderByNombreAsc());
     }
 
-    /**
-     * Obtener menciones por programa de estudio
-     */
     @Transactional(readOnly = true)
     public List<MencionResponse> findByProgramaEstudioId(Long programaEstudioId) {
-        List<Mencion> menciones = mencionRepository.findByProgramaEstudioIdAndActivoTrueOrderByNombreAsc(programaEstudioId);
-        return menciones.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(mencionRepository.findByProgramaEstudioIdAndActivoTrueOrderByNombreAsc(programaEstudioId));
     }
 
-    /**
-     * Obtener menciones disponibles por programa de estudio
-     */
     @Transactional(readOnly = true)
     public List<MencionResponse> findAvailableByProgramaEstudioId(Long programaEstudioId) {
-        List<Mencion> menciones = mencionRepository.findByProgramaEstudioIdAndActivoTrueAndDisponibleTrueOrderByNombreAsc(programaEstudioId);
-        return menciones.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(mencionRepository
+                .findByProgramaEstudioIdAndActivoTrueAndDisponibleTrueOrderByNombreAsc(programaEstudioId));
     }
 
-    /**
-     * Obtener mención por ID
-     */
     @Transactional(readOnly = true)
     public MencionResponse findById(Long id) {
-        Mencion mencion = mencionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mención no encontrada con ID: " + id));
-        return convertToResponse(mencion);
+        return convertToResponse(findMencionOrThrow(id));
     }
 
-    /**
-     * Crear nueva mención
-     */
     public MencionResponse create(MencionRequest request) {
-        // Validar que el programa de estudio existe y está activo
-        ProgramaEstudio programaEstudio = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-        
-        if (!programaEstudio.getActivo()) {
-            throw new BadRequestException("No se puede crear la mención en un programa de estudio inactivo");
-        }
-
-        // Validar que no existe otra mención con el mismo nombre
-        Optional<Mencion> mencionExistentePorNombre = mencionRepository.findByNombre(request.getNombre());
-        if (mencionExistentePorNombre.isPresent()) {
-            throw new BadRequestException("Ya existe una mención con el nombre: " + request.getNombre());
-        }
-
-        // Validar que no existe otra mención con el mismo código
-        Optional<Mencion> mencionExistentePorCodigo = mencionRepository.findByCodigo(request.getCodigo());
-        if (mencionExistentePorCodigo.isPresent()) {
-            throw new BadRequestException("Ya existe una mención con el código: " + request.getCodigo());
-        }
+        ProgramaEstudio programaEstudio = resolveActivePrograma(
+                request.getProgramaEstudioId(),
+                "No se puede crear la mención en un programa de estudio inactivo");
+        assertUniqueNombreYCodigo(request.getNombre(), request.getCodigo(), null);
 
         Mencion mencion = new Mencion();
-        mencion.setNombre(request.getNombre());
-        mencion.setCodigo(request.getCodigo());
-        mencion.setDescripcion(request.getDescripcion());
-        mencion.setRequisitos(request.getRequisitos());
-        mencion.setProgramaEstudio(programaEstudio);
+        applyRequestData(mencion, request, programaEstudio);
         mencion.setActivo(true);
         mencion.setDisponible(true);
 
-        Mencion savedMencion = mencionRepository.save(mencion);
-        return convertToResponse(savedMencion);
+        return convertToResponse(mencionRepository.save(mencion));
     }
 
-    /**
-     * Actualizar mención existente
-     */
     public MencionResponse update(Long id, MencionRequest request) {
-        Mencion mencion = mencionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mención no encontrada con ID: " + id));
+        Mencion mencion = findMencionOrThrow(id);
+        ProgramaEstudio programaEstudio = resolveActivePrograma(
+                request.getProgramaEstudioId(),
+                "No se puede asignar la mención a un programa de estudio inactivo");
+        assertUniqueNombreYCodigo(request.getNombre(), request.getCodigo(), id);
 
-        // Validar que el programa de estudio existe y está activo
-        ProgramaEstudio programaEstudio = programaEstudioRepository.findById(request.getProgramaEstudioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Programa de estudio no encontrado con ID: " + request.getProgramaEstudioId()));
-        
-        if (!programaEstudio.getActivo()) {
-            throw new BadRequestException("No se puede asignar la mención a un programa de estudio inactivo");
-        }
-
-        // Validar que no existe otra mención con el mismo nombre (excluyendo la actual)
-        Optional<Mencion> mencionExistentePorNombre = mencionRepository.findByNombre(request.getNombre());
-        if (mencionExistentePorNombre.isPresent() && !mencionExistentePorNombre.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una mención con el nombre: " + request.getNombre());
-        }
-
-        // Validar que no existe otra mención con el mismo código (excluyendo la actual)
-        Optional<Mencion> mencionExistentePorCodigo = mencionRepository.findByCodigo(request.getCodigo());
-        if (mencionExistentePorCodigo.isPresent() && !mencionExistentePorCodigo.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una mención con el código: " + request.getCodigo());
-        }
-
-        mencion.setNombre(request.getNombre());
-        mencion.setCodigo(request.getCodigo());
-        mencion.setDescripcion(request.getDescripcion());
-        mencion.setRequisitos(request.getRequisitos());
-        mencion.setProgramaEstudio(programaEstudio);
-
-        Mencion updatedMencion = mencionRepository.save(mencion);
-        return convertToResponse(updatedMencion);
+        applyRequestData(mencion, request, programaEstudio);
+        return convertToResponse(mencionRepository.save(mencion));
     }
 
-    /**
-     * Activar/desactivar mención
-     */
     public MencionResponse toggleActive(Long id) {
-        Mencion mencion = mencionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mención no encontrada con ID: " + id));
-
+        Mencion mencion = findMencionOrThrow(id);
         mencion.setActivo(!mencion.getActivo());
-        Mencion updatedMencion = mencionRepository.save(mencion);
-        return convertToResponse(updatedMencion);
+        return convertToResponse(mencionRepository.save(mencion));
     }
 
-    /**
-     * Activar/desactivar disponibilidad de mención
-     */
     public MencionResponse toggleDisponible(Long id) {
-        Mencion mencion = mencionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mención no encontrada con ID: " + id));
-
+        Mencion mencion = findMencionOrThrow(id);
         mencion.setDisponible(!mencion.getDisponible());
-        Mencion updatedMencion = mencionRepository.save(mencion);
-        return convertToResponse(updatedMencion);
+        return convertToResponse(mencionRepository.save(mencion));
     }
 
-    /**
-     * Eliminar mención (borrado lógico)
-     */
     public void delete(Long id) {
-        Mencion mencion = mencionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mención no encontrada con ID: " + id));
-
+        Mencion mencion = findMencionOrThrow(id);
         mencion.setActivo(false);
         mencion.setDisponible(false);
         mencionRepository.save(mencion);
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private ProgramaEstudio resolveActivePrograma(Long programaEstudioId, String inactiveMessage) {
+        ProgramaEstudio programaEstudio = programaEstudioRepository.findById(programaEstudioId)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_PROGRAMA_NO_ENCONTRADO + programaEstudioId));
+        if (!programaEstudio.getActivo()) {
+            throw new BadRequestException(inactiveMessage);
+        }
+        return programaEstudio;
+    }
+
+    private void assertUniqueNombreYCodigo(String nombre, String codigo, Long excludeId) {
+        assertNotTaken(mencionRepository.findByNombre(nombre), excludeId, MSG_NOMBRE_DUPLICADO + nombre);
+        assertNotTaken(mencionRepository.findByCodigo(codigo), excludeId, MSG_CODIGO_DUPLICADO + codigo);
+    }
+
+    private void assertNotTaken(Optional<Mencion> existing, Long excludeId, String message) {
+        Predicate<Mencion> isOther = mencion -> excludeId == null || !mencion.getId().equals(excludeId);
+        if (existing.filter(isOther).isPresent()) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    private void applyRequestData(Mencion mencion, MencionRequest request, ProgramaEstudio programaEstudio) {
+        mencion.setNombre(request.getNombre());
+        mencion.setCodigo(request.getCodigo());
+        mencion.setDescripcion(request.getDescripcion());
+        mencion.setRequisitos(request.getRequisitos());
+        mencion.setProgramaEstudio(programaEstudio);
+    }
+
+    private Mencion findMencionOrThrow(Long id) {
+        return mencionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_MENCION_NO_ENCONTRADA + id));
+    }
+
+    private List<MencionResponse> mapAll(List<Mencion> menciones) {
+        return menciones.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private MencionResponse convertToResponse(Mencion mencion) {
         MencionResponse response = new MencionResponse();
         response.setId(mencion.getId());
@@ -209,16 +161,18 @@ public class MencionService {
         response.setRequisitos(mencion.getRequisitos());
         response.setFechaCreacion(mencion.getFechaCreacion());
         response.setFechaActualizacion(mencion.getFechaActualizacion());
-
-        // Convertir información del programa de estudio
-        if (mencion.getProgramaEstudio() != null) {
-            ProgramaEstudioBasicResponse programaBasic = new ProgramaEstudioBasicResponse();
-            programaBasic.setId(mencion.getProgramaEstudio().getId());
-            programaBasic.setNombre(mencion.getProgramaEstudio().getNombre());
-            programaBasic.setCodigo(mencion.getProgramaEstudio().getCodigo());
-            response.setProgramaEstudio(programaBasic);
-        }
-
+        response.setProgramaEstudio(toProgramaBasic(mencion.getProgramaEstudio()));
         return response;
+    }
+
+    private ProgramaEstudioBasicResponse toProgramaBasic(ProgramaEstudio programa) {
+        if (programa == null) {
+            return null;
+        }
+        ProgramaEstudioBasicResponse programaBasic = new ProgramaEstudioBasicResponse();
+        programaBasic.setId(programa.getId());
+        programaBasic.setNombre(programa.getNombre());
+        programaBasic.setCodigo(programa.getCodigo());
+        return programaBasic;
     }
 }

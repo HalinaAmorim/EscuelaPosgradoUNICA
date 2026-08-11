@@ -1,10 +1,11 @@
 package com.escuelaposgrado.Matricula.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,159 +23,109 @@ import com.escuelaposgrado.Matricula.repository.FacultadRepository;
 @Transactional
 public class FacultadService {
 
-    @Autowired
-    private FacultadRepository facultadRepository;
+    private static final String MSG_FACULTAD_NO_ENCONTRADA = "Facultad no encontrada con ID: ";
+    private static final String MSG_CODIGO_DUPLICADO = "Ya existe una facultad con el código ";
+    private static final String MSG_NOMBRE_DUPLICADO = "Ya existe una facultad con el nombre ";
 
-    /**
-     * Obtener todas las facultades
-     */
+    private final FacultadRepository facultadRepository;
+
+    public FacultadService(FacultadRepository facultadRepository) {
+        this.facultadRepository = facultadRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<FacultadResponse> findAll() {
-        List<Facultad> facultades = facultadRepository.findAll();
-        return facultades.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(facultadRepository.findAll());
     }
 
-    /**
-     * Obtener todas las facultades activas
-     */
     @Transactional(readOnly = true)
     public List<FacultadResponse> findAllActive() {
-        List<Facultad> facultades = facultadRepository.findByActivoTrueOrderByNombreAsc();
-        return facultades.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(facultadRepository.findByActivoTrueOrderByNombreAsc());
     }
 
-    /**
-     * Obtener facultad por ID
-     */
     @Transactional(readOnly = true)
     public FacultadResponse findById(Long id) {
-        Facultad facultad = facultadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + id));
-        return convertToResponse(facultad);
+        return convertToResponse(findFacultadOrThrow(id));
     }
 
-    /**
-     * Crear nueva facultad
-     */
     public FacultadResponse create(FacultadRequest request) {
-        // Validar que no existe otra facultad con el mismo código
-        Optional<Facultad> facultadExistentePorCodigo = facultadRepository.findByCodigo(request.getCodigo());
-        if (facultadExistentePorCodigo.isPresent()) {
-            throw new BadRequestException("Ya existe una facultad con el código " + request.getCodigo());
-        }
-
-        // Validar que no existe otra facultad con el mismo nombre
-        Optional<Facultad> facultadExistentePorNombre = facultadRepository.findByNombre(request.getNombre());
-        if (facultadExistentePorNombre.isPresent()) {
-            throw new BadRequestException("Ya existe una facultad con el nombre " + request.getNombre());
-        }
+        assertUniqueCodigoYNombre(request.getCodigo(), request.getNombre(), null);
 
         Facultad facultad = new Facultad();
-        facultad.setNombre(request.getNombre());
-        facultad.setCodigo(request.getCodigo());
-        facultad.setDescripcion(request.getDescripcion());
-        facultad.setDecano(request.getDecano());
+        applyRequestData(facultad, request);
         facultad.setActivo(true);
 
-        Facultad savedFacultad = facultadRepository.save(facultad);
-        return convertToResponse(savedFacultad);
+        return convertToResponse(facultadRepository.save(facultad));
     }
 
-    /**
-     * Actualizar facultad existente
-     */
     public FacultadResponse update(Long id, FacultadRequest request) {
-        Facultad facultad = facultadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + id));
-
-        // Validar que no existe otra facultad con el mismo código (excluyendo la actual)
-        Optional<Facultad> facultadExistentePorCodigo = facultadRepository.findByCodigo(request.getCodigo());
-        if (facultadExistentePorCodigo.isPresent() && !facultadExistentePorCodigo.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una facultad con el código " + request.getCodigo());
-        }
-
-        // Validar que no existe otra facultad con el mismo nombre (excluyendo la actual)
-        Optional<Facultad> facultadExistentePorNombre = facultadRepository.findByNombre(request.getNombre());
-        if (facultadExistentePorNombre.isPresent() && !facultadExistentePorNombre.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una facultad con el nombre " + request.getNombre());
-        }
-
-        facultad.setNombre(request.getNombre());
-        facultad.setCodigo(request.getCodigo());
-        facultad.setDescripcion(request.getDescripcion());
-        facultad.setDecano(request.getDecano());
-
-        Facultad updatedFacultad = facultadRepository.save(facultad);
-        return convertToResponse(updatedFacultad);
+        Facultad facultad = findFacultadOrThrow(id);
+        assertUniqueCodigoYNombre(request.getCodigo(), request.getNombre(), id);
+        applyRequestData(facultad, request);
+        return convertToResponse(facultadRepository.save(facultad));
     }
 
-    /**
-     * Activar/desactivar facultad
-     */
     public FacultadResponse toggleActive(Long id) {
-        Facultad facultad = facultadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + id));
-
+        Facultad facultad = findFacultadOrThrow(id);
         facultad.setActivo(!facultad.getActivo());
-        Facultad updatedFacultad = facultadRepository.save(facultad);
-        return convertToResponse(updatedFacultad);
+        return convertToResponse(facultadRepository.save(facultad));
     }
 
-    /**
-     * Eliminar facultad (borrado lógico)
-     */
     public void delete(Long id) {
-        Facultad facultad = facultadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + id));
-
+        Facultad facultad = findFacultadOrThrow(id);
         facultad.setActivo(false);
         facultadRepository.save(facultad);
     }
 
-    /**
-     * Buscar facultades por nombre
-     */
     @Transactional(readOnly = true)
     public List<FacultadResponse> findByNombreContaining(String nombre) {
-        // Como no existe el método exacto, usar findAll y filtrar
-        List<Facultad> todasLasFacultades = facultadRepository.findAll();
-        List<Facultad> facultades = todasLasFacultades.stream()
-                .filter(facultad -> facultad.getNombre().toLowerCase().contains(nombre.toLowerCase()) && facultad.getActivo())
-                .collect(Collectors.toList());
-        return facultades.stream()
+        String nombreLower = nombre.toLowerCase();
+        return facultadRepository.findAll().stream()
+                .filter(facultad -> facultad.getNombre().toLowerCase().contains(nombreLower) && facultad.getActivo())
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    /**
-     * Buscar facultades por decano
-     */
     @Transactional(readOnly = true)
     public List<FacultadResponse> findByDecanoContaining(String decano) {
-        List<Facultad> facultades = facultadRepository.findByDecanoIgnoreCaseContainingAndActivoTrueOrderByNombreAsc(decano);
-        return facultades.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(facultadRepository.findByDecanoIgnoreCaseContainingAndActivoTrueOrderByNombreAsc(decano));
     }
 
-    /**
-     * Obtener facultades con programas activos
-     */
     @Transactional(readOnly = true)
     public List<FacultadResponse> findFacultadesConProgramasActivos() {
-        List<Facultad> facultades = facultadRepository.findFacultadesConProgramasActivos();
-        return facultades.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(facultadRepository.findFacultadesConProgramasActivos());
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private void assertUniqueCodigoYNombre(String codigo, String nombre, Long excludeId) {
+        assertNotTaken(facultadRepository.findByCodigo(codigo), excludeId, MSG_CODIGO_DUPLICADO + codigo);
+        assertNotTaken(facultadRepository.findByNombre(nombre), excludeId, MSG_NOMBRE_DUPLICADO + nombre);
+    }
+
+    private void assertNotTaken(Optional<Facultad> existing, Long excludeId, String message) {
+        Predicate<Facultad> isOther = facultad -> excludeId == null || !facultad.getId().equals(excludeId);
+        if (existing.filter(isOther).isPresent()) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    private void applyRequestData(Facultad facultad, FacultadRequest request) {
+        facultad.setNombre(request.getNombre());
+        facultad.setCodigo(request.getCodigo());
+        facultad.setDescripcion(request.getDescripcion());
+        facultad.setDecano(request.getDecano());
+    }
+
+    private Facultad findFacultadOrThrow(Long id) {
+        return facultadRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_FACULTAD_NO_ENCONTRADA + id));
+    }
+
+    private List<FacultadResponse> mapAll(List<Facultad> facultades) {
+        return facultades.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private FacultadResponse convertToResponse(Facultad facultad) {
         FacultadResponse response = new FacultadResponse();
         response.setId(facultad.getId());
@@ -185,7 +136,6 @@ public class FacultadService {
         response.setActivo(facultad.getActivo());
         response.setFechaCreacion(facultad.getFechaCreacion());
         response.setFechaActualizacion(facultad.getFechaActualizacion());
-
         return response;
     }
 }

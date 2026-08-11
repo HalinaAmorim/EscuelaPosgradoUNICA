@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -39,8 +38,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/periodos-academicos")
 public class PeriodoAcademicoController {
 
-    @Autowired
-    private PeriodoAcademicoService periodoAcademicoService;
+    private final PeriodoAcademicoService periodoAcademicoService;
+
+    public PeriodoAcademicoController(PeriodoAcademicoService periodoAcademicoService) {
+        this.periodoAcademicoService = periodoAcademicoService;
+    }
 
     @Operation(
         summary = "📋 Listar todos los períodos académicos",

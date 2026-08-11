@@ -1,18 +1,20 @@
 package com.escuelaposgrado.Matricula.service;
 
-import com.escuelaposgrado.Matricula.model.entity.Sede;
-import com.escuelaposgrado.Matricula.dto.request.SedeRequest;
-import com.escuelaposgrado.Matricula.dto.response.SedeResponse;
-import com.escuelaposgrado.Matricula.repository.SedeRepository;
-import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
-import com.escuelaposgrado.Matricula.exception.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
+import com.escuelaposgrado.Matricula.dto.request.SedeRequest;
+import com.escuelaposgrado.Matricula.dto.response.SedeResponse;
+import com.escuelaposgrado.Matricula.exception.BadRequestException;
+import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
+import com.escuelaposgrado.Matricula.model.entity.Sede;
+import com.escuelaposgrado.Matricula.repository.SedeRepository;
 
 /**
  * Servicio para gestionar las operaciones CRUD de Sedes
@@ -21,133 +23,101 @@ import java.util.Optional;
 @Transactional
 public class SedeService {
 
-    @Autowired
-    private SedeRepository sedeRepository;
+    private static final String MSG_SEDE_NO_ENCONTRADA = "Sede no encontrada con ID: ";
+    private static final String MSG_NOMBRE_DUPLICADO = "Ya existe una sede con el nombre: ";
+    private static final String MSG_CODIGO_DUPLICADO = "Ya existe una sede con el código: ";
 
-    /**
-     * Obtener todas las sedes
-     */
+    private final SedeRepository sedeRepository;
+
+    public SedeService(SedeRepository sedeRepository) {
+        this.sedeRepository = sedeRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<SedeResponse> findAll() {
-        List<Sede> sedes = sedeRepository.findAll();
-        return sedes.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(sedeRepository.findAll());
     }
 
-    /**
-     * Obtener todas las sedes activas
-     */
     @Transactional(readOnly = true)
     public List<SedeResponse> findAllActive() {
-        List<Sede> sedes = sedeRepository.findByActivoTrue();
-        return sedes.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(sedeRepository.findByActivoTrue());
     }
 
-    /**
-     * Obtener sede por ID
-     */
     @Transactional(readOnly = true)
     public SedeResponse findById(Long id) {
-        Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + id));
-        return convertToResponse(sede);
+        return convertToResponse(findSedeOrThrow(id));
     }
 
-    /**
-     * Crear nueva sede
-     */
     public SedeResponse create(SedeRequest request) {
-        // Validar que no existe otra sede con el mismo nombre
         if (sedeRepository.existsByNombreIgnoreCase(request.getNombre())) {
-            throw new BadRequestException("Ya existe una sede con el nombre: " + request.getNombre());
+            throw new BadRequestException(MSG_NOMBRE_DUPLICADO + request.getNombre());
         }
-
-        // Validar que no existe otra sede con el mismo código
         if (sedeRepository.existsByCodigo(request.getCodigo())) {
-            throw new BadRequestException("Ya existe una sede con el código: " + request.getCodigo());
+            throw new BadRequestException(MSG_CODIGO_DUPLICADO + request.getCodigo());
         }
 
         Sede sede = new Sede();
-        sede.setNombre(request.getNombre());
-        sede.setCodigo(request.getCodigo());
-        sede.setDireccion(request.getDireccion());
-        sede.setTelefono(request.getTelefono());
-        sede.setEmail(request.getEmail());
+        applyRequestData(sede, request);
         sede.setActivo(true);
 
-        Sede savedSede = sedeRepository.save(sede);
-        return convertToResponse(savedSede);
+        return convertToResponse(sedeRepository.save(sede));
     }
 
-    /**
-     * Actualizar sede existente
-     */
     public SedeResponse update(Long id, SedeRequest request) {
-        Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + id));
-
-        // Validar que no existe otra sede con el mismo nombre (excluyendo la actual)
-        Optional<Sede> sedeExistentePorNombre = sedeRepository.findByNombreIgnoreCase(request.getNombre());
-        if (sedeExistentePorNombre.isPresent() && !sedeExistentePorNombre.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una sede con el nombre: " + request.getNombre());
-        }
-
-        // Validar que no existe otra sede con el mismo código (excluyendo la actual)
-        Optional<Sede> sedeExistentePorCodigo = sedeRepository.findByCodigo(request.getCodigo());
-        if (sedeExistentePorCodigo.isPresent() && !sedeExistentePorCodigo.get().getId().equals(id)) {
-            throw new BadRequestException("Ya existe una sede con el código: " + request.getCodigo());
-        }
-
-        sede.setNombre(request.getNombre());
-        sede.setCodigo(request.getCodigo());
-        sede.setDireccion(request.getDireccion());
-        sede.setTelefono(request.getTelefono());
-        sede.setEmail(request.getEmail());
-
-        Sede updatedSede = sedeRepository.save(sede);
-        return convertToResponse(updatedSede);
+        Sede sede = findSedeOrThrow(id);
+        assertUniqueNombreYCodigo(request.getNombre(), request.getCodigo(), id);
+        applyRequestData(sede, request);
+        return convertToResponse(sedeRepository.save(sede));
     }
 
-    /**
-     * Activar/desactivar sede
-     */
     public SedeResponse toggleActive(Long id) {
-        Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + id));
-
+        Sede sede = findSedeOrThrow(id);
         sede.setActivo(!sede.getActivo());
-        Sede updatedSede = sedeRepository.save(sede);
-        return convertToResponse(updatedSede);
+        return convertToResponse(sedeRepository.save(sede));
     }
 
-    /**
-     * Eliminar sede (borrado lógico)
-     */
     public void delete(Long id) {
-        Sede sede = sedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sede no encontrada con ID: " + id));
-
+        Sede sede = findSedeOrThrow(id);
         sede.setActivo(false);
         sedeRepository.save(sede);
     }
 
-    /**
-     * Buscar sedes por nombre
-     */
     @Transactional(readOnly = true)
     public List<SedeResponse> findByNombreContaining(String nombre) {
-        List<Sede> sedes = sedeRepository.findByNombreContainingIgnoreCase(nombre);
-        return sedes.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return mapAll(sedeRepository.findByNombreContainingIgnoreCase(nombre));
     }
 
-    /**
-     * Convertir entidad a DTO de respuesta
-     */
+    private void assertUniqueNombreYCodigo(String nombre, String codigo, Long excludeId) {
+        assertNotTaken(sedeRepository.findByNombreIgnoreCase(nombre), excludeId, MSG_NOMBRE_DUPLICADO + nombre);
+        assertNotTaken(sedeRepository.findByCodigo(codigo), excludeId, MSG_CODIGO_DUPLICADO + codigo);
+    }
+
+    private void assertNotTaken(Optional<Sede> existing, Long excludeId, String message) {
+        Predicate<Sede> isOther = sede -> excludeId == null || !sede.getId().equals(excludeId);
+        if (existing.filter(isOther).isPresent()) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    private void applyRequestData(Sede sede, SedeRequest request) {
+        sede.setNombre(request.getNombre());
+        sede.setCodigo(request.getCodigo());
+        sede.setDireccion(request.getDireccion());
+        sede.setTelefono(request.getTelefono());
+        sede.setEmail(request.getEmail());
+    }
+
+    private Sede findSedeOrThrow(Long id) {
+        return sedeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_SEDE_NO_ENCONTRADA + id));
+    }
+
+    private List<SedeResponse> mapAll(List<Sede> sedes) {
+        return sedes.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private SedeResponse convertToResponse(Sede sede) {
         SedeResponse response = new SedeResponse();
         response.setId(sede.getId());

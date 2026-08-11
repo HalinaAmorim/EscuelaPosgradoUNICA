@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +35,11 @@ import jakarta.validation.Valid;
 @Tag(name = "Facultades", description = "API para gestionar facultades")
 public class FacultadController {
 
-    @Autowired
-    private FacultadService facultadService;
+    private final FacultadService facultadService;
+
+    public FacultadController(FacultadService facultadService) {
+        this.facultadService = facultadService;
+    }
 
     /**
      * Obtener todas las facultades

@@ -1,6 +1,8 @@
 package com.escuelaposgrado.Matricula.security.jwt;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +17,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Punto de entrada de autenticación para manejar errores de acceso no autorizado
+ * Punto de entrada de autenticación para manejar errores de acceso no autorizado.
  */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
@@ -29,7 +28,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                         AuthenticationException authException) throws IOException, ServletException {
-        
+
         logger.error("Error de autorización: {}", authException.getMessage());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

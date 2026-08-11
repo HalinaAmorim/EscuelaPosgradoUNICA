@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.escuelaposgrado.Autenticacion.config.CorsOrigins;
 import com.escuelaposgrado.Autenticacion.dto.response.MessageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,28 +26,27 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Controlador REST para health checks y información del servicio
+ * Health checks e información del microservicio.
  */
-@Tag(name = "💊 Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, 
+@Tag(name = "Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
+@CrossOrigin(origins = {CorsOrigins.LOCALHOST, CorsOrigins.LOCALHOST_IP},
              allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/health")
 public class HealthController {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
+    private final BuildProperties buildProperties;
 
-    @Autowired(required = false)
-    private BuildProperties buildProperties;
+    public HealthController(DataSource dataSource, ObjectProvider<BuildProperties> buildPropertiesProvider) {
+        this.dataSource = dataSource;
+        this.buildProperties = buildPropertiesProvider.getIfAvailable();
+    }
 
-    /**
-     * Health check básico
-     */
     @Operation(
             summary = "Estado básico del servicio",
             description = "Verifica que el microservicio esté funcionando correctamente",
-            tags = {"💊 Salud del Sistema"}
+            tags = {"Salud del Sistema"}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -72,54 +72,46 @@ public class HealthController {
         return ResponseEntity.ok(new MessageResponse("Microservicio de Autenticación - ACTIVO"));
     }
 
-    /**
-     * Health check completo
-     */
     @GetMapping("/check")
     public ResponseEntity<Map<String, Object>> healthCheck() {
         Map<String, Object> health = new HashMap<>();
-        
         try {
-            // Verificar conexión a base de datos
-            try (Connection connection = dataSource.getConnection()) {
-                boolean isValid = connection.isValid(5);
-                health.put("database", isValid ? "UP" : "DOWN");
-            }
-            
-            // Información del servicio
+            health.put("database", isDatabaseUp() ? "UP" : "DOWN");
             health.put("service", "Autenticación");
             health.put("status", "UP");
             health.put("timestamp", System.currentTimeMillis());
-            
-            // Información de build si está disponible
-            if (buildProperties != null) {
-                health.put("version", buildProperties.getVersion());
-                health.put("buildTime", buildProperties.getTime());
-            }
-            
+            putBuildInfo(health);
+            return ResponseEntity.ok(health);
         } catch (Exception e) {
             health.put("status", "DOWN");
             health.put("error", e.getMessage());
             return ResponseEntity.status(503).body(health);
         }
-        
-        return ResponseEntity.ok(health);
     }
 
-    /**
-     * Información del servicio
-     */
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() {
         Map<String, Object> info = new HashMap<>();
-        
         info.put("name", "Microservicio de Autenticación");
         info.put("description", "Sistema de autenticación y autorización para la Escuela de Posgrado UNICA");
         info.put("version", "1.0.0");
         info.put("institution", "Universidad Nacional San Luis Gonzaga de Ica");
         info.put("java_version", System.getProperty("java.version"));
         info.put("spring_profiles", System.getProperty("spring.profiles.active", "default"));
-        
         return ResponseEntity.ok(info);
+    }
+
+    private boolean isDatabaseUp() throws Exception {
+        try (Connection connection = dataSource.getConnection()) {
+            return connection.isValid(5);
+        }
+    }
+
+    private void putBuildInfo(Map<String, Object> health) {
+        if (buildProperties == null) {
+            return;
+        }
+        health.put("version", buildProperties.getVersion());
+        health.put("buildTime", buildProperties.getTime());
     }
 }

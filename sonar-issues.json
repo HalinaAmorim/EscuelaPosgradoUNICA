@@ -1,0 +1,3206 @@
+[
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S106",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/IntranetApplication.java",
+        "line":  20,
+        "message":  "Replace this use of System.out by a logger."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6126",
+        "effort":  "2min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/IntranetApplication.java",
+        "line":  20,
+        "message":  "Replace this String concatenation with Text block."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/config/SecurityConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/AsistenciaController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/AsistenciaController.java",
+        "line":  47,
+        "message":  "Define a constant instead of duplicating this literal \"Error: \" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/AsistenciaController.java",
+        "line":  133,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/AuthController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/CalificacionController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/CalificacionController.java",
+        "line":  46,
+        "message":  "Define a constant instead of duplicating this literal \"Error: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/EncuestaController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "14min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/EncuestaController.java",
+        "line":  51,
+        "message":  "Define a constant instead of duplicating this literal \"Error: \" 6 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/EncuestaController.java",
+        "line":  191,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/EncuestaController.java",
+        "line":  203,
+        "message":  "Update this method so that its implementation is not identical to \"obtenerEncuestasActivas\" on line 120."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/HealthController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/HealthController.java",
+        "line":  37,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/HealthController.java",
+        "line":  59,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/HealthController.java",
+        "line":  95,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/RootController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/RootController.java",
+        "line":  38,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/UsuarioController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/UsuarioController.java",
+        "line":  72,
+        "message":  "Define a constant instead of duplicating this literal \"Error: \" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/controller/UsuarioController.java",
+        "line":  172,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Asistencia.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Asistencia.java",
+        "line":  79,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Asistencia.java",
+        "line":  80,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Asistencia.java",
+        "line":  85,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Calificacion.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Calificacion.java",
+        "line":  112,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Calificacion.java",
+        "line":  113,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Calificacion.java",
+        "line":  118,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Ciclo.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  96,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  97,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  102,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  107,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  112,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  116,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  120,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1905",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Encuesta.java",
+        "line":  124,
+        "message":  "Remove this unnecessary cast to \"int\"."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/EstadoAsistencia.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Materia.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Materia.java",
+        "line":  82,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Materia.java",
+        "line":  83,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Materia.java",
+        "line":  88,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/PreguntaEncuesta.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/PreguntaEncuesta.java",
+        "line":  78,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/PreguntaEncuesta.java",
+        "line":  79,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/PreguntaEncuesta.java",
+        "line":  84,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/PreguntaEncuesta.java",
+        "line":  143,
+        "message":  "Update this method so that its implementation is not identical to \"getOpcionesJson\" on line 116."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/RespuestaEncuesta.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/RespuestaEncuesta.java",
+        "line":  66,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Role.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/TipoEncuesta.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/TipoEvaluacion.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/TipoPregunta.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  113,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  114,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  119,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  201,
+        "message":  "Update this method so that its implementation is not identical to \"getRole\" on line 164."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/model/Usuario.java",
+        "line":  204,
+        "message":  "Update this method so that its implementation is not identical to \"getFechaCreacion\" on line 185."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/AsistenciaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/CalificacionRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/EncuestaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/MateriaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/PreguntaEncuestaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/RespuestaEncuestaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S1135",
+        "effort":  "0min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/RespuestaEncuestaRepository.java",
+        "line":  43,
+        "message":  "Complete the task associated to this TODO comment."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S125",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/RespuestaEncuestaRepository.java",
+        "line":  45,
+        "message":  "This block of commented-out lines of code should be removed."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/repository/UsuarioRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/jwt/AuthEntryPointJwt.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/jwt/AuthTokenFilter.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S2143",
+        "effort":  "15min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/jwt/JwtUtils.java",
+        "line":  null,
+        "message":  "Use the \"java.time\" API for date and time."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/jwt/JwtUtils.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/services/UserDetailsServiceImpl.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/security/services/UserPrincipal.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  42,
+        "message":  "Define a constant instead of duplicating this literal \"Estudiante no encontrado\" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  45,
+        "message":  "Define a constant instead of duplicating this literal \"Materia no encontrada\" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  49,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  97,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  111,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  128,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  139,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  150,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  214,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/AsistenciaService.java",
+        "line":  222,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  46,
+        "message":  "Define a constant instead of duplicating this literal \"Estudiante no encontrado\" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "16min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  49,
+        "message":  "Define a constant instead of duplicating this literal \"Materia no encontrada\" 7 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  55,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S3457",
+        "effort":  "1min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  104,
+        "message":  "%n should be used in place of \\n to produce the platform-specific line separator."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  105,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  126,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  140,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  157,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  168,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  289,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  300,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/CalificacionService.java",
+        "line":  308,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  60,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  61,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "16min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  81,
+        "message":  "Define a constant instead of duplicating this literal \"Encuesta no encontrada\" 7 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  108,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  127,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  128,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  132,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  134,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  138,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  139,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  148,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  156,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  172,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  183,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  197,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  211,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  235,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/EncuestaService.java",
+        "line":  275,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  110,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  114,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  118,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  129,
+        "message":  "Define a constant instead of duplicating this literal \"Usuario no encontrado con ID: \" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  168,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  184,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "14min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  256,
+        "message":  "Define a constant instead of duplicating this literal \"Usuario no encontrado\" 6 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  266,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  269,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  280,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  303,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  309,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  343,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  355,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  366,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  377,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/service/UsuarioService.java",
+        "line":  388,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/ComisionUnidadPosgradoController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/ComisionUnidadPosgradoController.java",
+        "line":  224,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/TurnoMatriculaController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/TurnoMatriculaController.java",
+        "line":  184,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/TurnoMatriculaController.java",
+        "line":  201,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  56,
+        "message":  "Define a constant instead of duplicating this literal \"ComisionUnidadPosgrado no encontrada con ID: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  132,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  133,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  164,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ComisionUnidadPosgradoService.java",
+        "line":  193,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  48,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  59,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  70,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  81,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  92,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  103,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  112,
+        "message":  "Define a constant instead of duplicating this literal \"Turno de matrícula no encontrado con ID: \" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  124,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  132,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  157,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  179,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  187,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  267,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TurnoMatriculaService.java",
+        "line":  270,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/TasaPagoController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  42,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  49,
+        "message":  "Update this method so that its implementation is not identical to \"findAll\" on line 38."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  53,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  64,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  75,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  86,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  105,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  114,
+        "message":  "Define a constant instead of duplicating this literal \"Tasa de pago no encontrada con ID: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  139,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1125",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/TasaPagoService.java",
+        "line":  173,
+        "message":  "Remove the unnecessary boolean literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/MencionController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/MencionController.java",
+        "line":  155,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/MencionController.java",
+        "line":  172,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/ProgramaEstudioController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  42,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  53,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  64,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  75,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  84,
+        "message":  "Define a constant instead of duplicating this literal \"Mención no encontrada con ID: \" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  96,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/MencionService.java",
+        "line":  136,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  42,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  53,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  64,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  75,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  86,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  97,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  106,
+        "message":  "Define a constant instead of duplicating this literal \"Programa de estudio no encontrado con ID: \" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  134,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  179,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  219,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/ProgramaEstudioService.java",
+        "line":  234,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/FacultadController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/FacultadController.java",
+        "line":  140,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  36,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  47,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  56,
+        "message":  "Define a constant instead of duplicating this literal \"Facultad no encontrada con ID: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  147,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  150,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  161,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/FacultadService.java",
+        "line":  172,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/config/CorsFilter.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/config/WebConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "12min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/PeriodoAcademicoService.java",
+        "line":  55,
+        "message":  "Define a constant instead of duplicating this literal \"Período académico no encontrado con ID: \" 5 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/config/SecurityConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/config/SwaggerConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/AulaController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/AulaController.java",
+        "line":  142,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/HealthController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/HealthController.java",
+        "line":  37,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/HealthController.java",
+        "line":  69,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/PeriodoAcademicoController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/SedeController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/controller/SedeController.java",
+        "line":  128,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/exception/BadRequestException.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/exception/GlobalExceptionHandler.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1611",
+        "effort":  "2min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/exception/GlobalExceptionHandler.java",
+        "line":  39,
+        "message":  "Remove the parentheses around the \"error\" parameter"
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/exception/ResourceNotFoundException.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/AulaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/ComisionUnidadPosgradoRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/FacultadRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/MencionRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/PeriodoAcademicoRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/ProgramaEstudioRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/SedeRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/TasaPagoRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/repository/TurnoMatriculaRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/security/jwt/AuthEntryPointJwt.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/security/jwt/AuthTokenFilter.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S2143",
+        "effort":  "15min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/security/jwt/JwtUtils.java",
+        "line":  null,
+        "message":  "Use the \"java.time\" API for date and time."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/security/jwt/JwtUtils.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  41,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  52,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  63,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S4144",
+        "effort":  "15min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  70,
+        "message":  "Update this method so that its implementation is not identical to \"findBySedeId\" on line 59."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  74,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  83,
+        "message":  "Define a constant instead of duplicating this literal \"Aula no encontrada con ID: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  95,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  130,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  186,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  189,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/AulaService.java",
+        "line":  200,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/PeriodoAcademicoService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/PeriodoAcademicoService.java",
+        "line":  46,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/PeriodoAcademicoService.java",
+        "line":  206,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/SedeService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/SedeService.java",
+        "line":  35,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/SedeService.java",
+        "line":  46,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/SedeService.java",
+        "line":  55,
+        "message":  "Define a constant instead of duplicating this literal \"Sede no encontrada con ID: \" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/service/SedeService.java",
+        "line":  145,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  566,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  600,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  618,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  699,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  78,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S3776",
+        "effort":  "7min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  103,
+        "message":  "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  134,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  140,
+        "message":  "Define a constant instead of duplicating this literal \"Fila \" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  259,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  264,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  267,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelService.java",
+        "line":  286,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  78,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S3776",
+        "effort":  "7min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  103,
+        "message":  "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  134,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  140,
+        "message":  "Define a constant instead of duplicating this literal \"Fila \" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  259,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  264,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  267,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/ExcelServiceNew.java",
+        "line":  286,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S2143",
+        "effort":  "15min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/jwt/JwtUtils.java",
+        "line":  null,
+        "message":  "Use the \"java.time\" API for date and time."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  99,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  104,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  111,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  123,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  135,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1141",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  151,
+        "message":  "Extract this nested try block into a separate method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S5411",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  195,
+        "message":  "Use a primitive boolean expression here."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  196,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  260,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/GoogleOAuthService.java",
+        "line":  337,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  496,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S3776",
+        "effort":  "6min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  414,
+        "message":  "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1066",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  429,
+        "message":  "Merge this if statement with the enclosing one."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S3776",
+        "effort":  "6min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  451,
+        "message":  "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S6208",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  460,
+        "message":  "Merge the previous cases into this one using comma-separated label."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1066",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  466,
+        "message":  "Merge this if statement with the enclosing one."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S6208",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  472,
+        "message":  "Merge the previous cases into this one using comma-separated label."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/DataCleanupService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S112",
+        "effort":  "20min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/DataCleanupService.java",
+        "line":  54,
+        "message":  "Replace generic exceptions with specific library exceptions or a custom exception."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  108,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "14min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/config/WebSecurityConfig.java",
+        "line":  87,
+        "message":  "Define a constant instead of duplicating this literal \"ADMIN\" 6 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/config/WebSecurityConfig.java",
+        "line":  87,
+        "message":  "Define a constant instead of duplicating this literal \"COORDINADOR\" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  459,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  264,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "8min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  155,
+        "message":  "Define a constant instead of duplicating this literal \"Error interno del servidor: \" 3 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  189,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  349,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1192",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  206,
+        "message":  "Define a constant instead of duplicating this literal \"Usuario no encontrado\" 4 times."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  354,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  147,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  178,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  240,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  230,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  250,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/config/SwaggerConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  49,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  73,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  203,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  286,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/CoordinadorController.java",
+        "line":  24,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/DocenteController.java",
+        "line":  26,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S2479",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/DocenteController.java",
+        "line":  44,
+        "message":  "Remove the non-escaped \\u200D character from this literal."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/config/DataInitializer.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/config/WebSecurityConfig.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AdminController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AlumnoController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/AuthController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/CoordinadorController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/DocenteController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/HealthController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/controller/PostulanteController.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/repository/UsuarioRepository.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/jwt/AuthEntryPointJwt.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/jwt/AuthTokenFilter.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/jwt/JwtUtils.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/services/UserDetailsServiceImpl.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S1488",
+        "effort":  "2min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/security/services/UserDetailsServiceImpl.java",
+        "line":  25,
+        "message":  "Immediately return this expression instead of assigning it to the temporary variable \"usuario\"."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S8688",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  66,
+        "message":  "Explicitly specify the time zone by passing a ZoneId or a Clock to the .now() method."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  220,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S6204",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  240,
+        "message":  "Replace this usage of \u0027Stream.collect(Collectors.toList())\u0027 with \u0027Stream.toList()\u0027 and ensure that the list is unmodified."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1066",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  391,
+        "message":  "Merge this if statement with the enclosing one."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1066",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  399,
+        "message":  "Merge this if statement with the enclosing one."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MAJOR",
+        "rule":  "java:S1066",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  406,
+        "message":  "Merge this if statement with the enclosing one."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S6208",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  423,
+        "message":  "Merge the previous cases into this one using comma-separated label."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "INFO",
+        "rule":  "java:S6208",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/service/AuthService.java",
+        "line":  435,
+        "message":  "Merge the previous cases into this one using comma-separated label."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Autenticacion/src/main/java/com/escuelaposgrado/Autenticacion/AutenticacionApplication.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1186",
+        "effort":  "5min",
+        "file":  "backend/Autenticacion/src/test/java/com/escuelaposgrado/Autenticacion/AutenticacionApplicationTests.java",
+        "line":  10,
+        "message":  "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Intranet/src/main/java/com/escuelaposgrado/Intranet/IntranetApplication.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1186",
+        "effort":  "5min",
+        "file":  "backend/Intranet/src/test/java/com/escuelaposgrado/Intranet/IntranetApplicationTests.java",
+        "line":  10,
+        "message":  "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "MINOR",
+        "rule":  "java:S120",
+        "effort":  "10min",
+        "file":  "backend/Matricula/src/main/java/com/escuelaposgrado/Matricula/MatriculaApplication.java",
+        "line":  1,
+        "message":  "Rename this package name to match the regular expression \u0027^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$\u0027."
+    },
+    {
+        "type":  "CODE_SMELL",
+        "severity":  "CRITICAL",
+        "rule":  "java:S1186",
+        "effort":  "5min",
+        "file":  "backend/Matricula/src/test/java/com/escuelaposgrado/Matricula/MatriculaApplicationTests.java",
+        "line":  10,
+        "message":  "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation."
+    }
+]

@@ -1,5 +1,6 @@
 package com.escuelaposgrado.Matricula.security.jwt;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -16,42 +17,33 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 
 /**
- * Utilidad para validar tokens JWT en el microservicio de Matrícula
+ * Validación JWT alineada con Autenticacion (mismo secret por defecto y UTF-8).
+ * Matrícula no emite tokens — solo valida.
  */
 @Component
 public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+    private static final String DEFAULT_SECRET = "escuelaPosgradoUnicaSecretKey2024";
 
-    @Value("${app.jwtSecret:escuelaPosgradoUnicaSecretKey2024}")
+    @Value("${app.jwtSecret:" + DEFAULT_SECRET + "}")
     private String jwtSecret;
 
-    /**
-     * Obtener username del token JWT
-     */
     public String getUserNameFromJwtToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(signingKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
 
-    /**
-     * Validar token JWT
-     */
     public boolean validateJwtToken(String authToken) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-            
             Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(signingKey())
                 .build()
                 .parseSignedClaims(authToken);
-            
             return true;
         } catch (MalformedJwtException e) {
             logger.error("Token JWT inválido: {}", e.getMessage());
@@ -64,21 +56,19 @@ public class JwtUtils {
         } catch (Exception e) {
             logger.error("Error validando token JWT: {}", e.getMessage());
         }
-        
         return false;
     }
 
-    /**
-     * Obtener fecha de expiración del token
-     */
     public Date getExpirationDateFromJwtToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(signingKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration();
+    }
+
+    private SecretKey signingKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 }

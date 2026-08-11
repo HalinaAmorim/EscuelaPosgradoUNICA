@@ -1,7 +1,9 @@
 package com.escuelaposgrado.Matricula.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,7 +100,7 @@ public class AulaService {
         return aulaRepository.findAll().stream()
                 .filter(aula -> aula.getNombre().toLowerCase().contains(nombreLower) && aula.getActivo())
                 .map(this::convertToResponse)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Transactional(readOnly = true)
@@ -144,7 +146,9 @@ public class AulaService {
     }
 
     private List<AulaResponse> mapAll(List<Aula> aulas) {
-        return aulas.stream().map(this::convertToResponse).toList();
+        return aulas.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private AulaResponse convertToResponse(Aula aula) {

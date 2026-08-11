@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import com.escuelaposgrado.Autenticacion.config.CorsOrigins;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Alumnos", description = "Endpoints específicos para estudiantes")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"},
+@CrossOrigin(origins = {CorsOrigins.LOCALHOST, CorsOrigins.LOCALHOST_IP},
              allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/alumno")

@@ -39,11 +39,11 @@ public class DataCleanupService {
 
             eliminarDuplicadosPorClave(usuarios, eliminados, "username", Usuario::getUsername, u -> true);
             eliminarDuplicadosPorClave(usuarios, eliminados, "email", Usuario::getEmail, u -> true);
-            eliminarDuplicadosPorClave(usuarios, eliminados, "DNI", Usuario::getDni, this::hasText);
+            eliminarDuplicadosPorClave(usuarios, eliminados, "DNI", Usuario::getDni, this::hasNonBlankDni);
             eliminarDuplicadosPorClave(
-                usuarios, eliminados, "código estudiante", Usuario::getCodigoEstudiante, this::hasCodigoEstudiante);
+                usuarios, eliminados, "código estudiante", Usuario::getCodigoEstudiante, this::hasNonBlankCodigoEstudiante);
             eliminarDuplicadosPorClave(
-                usuarios, eliminados, "código docente", Usuario::getCodigoDocente, this::hasCodigoDocente);
+                usuarios, eliminados, "código docente", Usuario::getCodigoDocente, this::hasNonBlankCodigoDocente);
 
             logger.info("Limpieza de duplicados completada exitosamente");
         } catch (RuntimeException e) {
@@ -57,9 +57,9 @@ public class DataCleanupService {
         boolean hayDuplicados =
             hasDuplicateValues(usuarios, Usuario::getUsername, u -> true)
                 || hasDuplicateValues(usuarios, Usuario::getEmail, u -> true)
-                || hasDuplicateValues(usuarios, Usuario::getDni, this::hasText)
-                || hasDuplicateValues(usuarios, Usuario::getCodigoEstudiante, this::hasCodigoEstudiante)
-                || hasDuplicateValues(usuarios, Usuario::getCodigoDocente, this::hasCodigoDocente);
+                || hasDuplicateValues(usuarios, Usuario::getDni, this::hasNonBlankDni)
+                || hasDuplicateValues(usuarios, Usuario::getCodigoEstudiante, this::hasNonBlankCodigoEstudiante)
+                || hasDuplicateValues(usuarios, Usuario::getCodigoDocente, this::hasNonBlankCodigoDocente);
 
         if (hayDuplicados) {
             logger.warn("Se encontraron registros duplicados en la base de datos");
@@ -107,15 +107,19 @@ public class DataCleanupService {
             .anyMatch(count -> count > 1);
     }
 
-    private boolean hasText(Usuario usuario) {
-        return usuario.getDni() != null && !usuario.getDni().trim().isEmpty();
+    private boolean hasNonBlankDni(Usuario usuario) {
+        return isNonBlank(usuario.getDni());
     }
 
-    private boolean hasCodigoEstudiante(Usuario usuario) {
-        return usuario.getCodigoEstudiante() != null && !usuario.getCodigoEstudiante().trim().isEmpty();
+    private boolean hasNonBlankCodigoEstudiante(Usuario usuario) {
+        return isNonBlank(usuario.getCodigoEstudiante());
     }
 
-    private boolean hasCodigoDocente(Usuario usuario) {
-        return usuario.getCodigoDocente() != null && !usuario.getCodigoDocente().trim().isEmpty();
+    private boolean hasNonBlankCodigoDocente(Usuario usuario) {
+        return isNonBlank(usuario.getCodigoDocente());
+    }
+
+    private boolean isNonBlank(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

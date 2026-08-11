@@ -15,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -52,21 +53,11 @@ public class JwtUtils {
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parser()
-                .verifyWith(signingKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return parseClaims(token).getSubject();
     }
 
     public List<String> getRolesFromJwtToken(String token) {
-        Object roles = Jwts.parser()
-                .verifyWith(signingKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get(CLAIM_ROLES);
+        Object roles = parseClaims(token).get(CLAIM_ROLES);
         if (roles instanceof List<?> list) {
             return list.stream().map(Object::toString).toList();
         }
@@ -75,10 +66,7 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser()
-                .verifyWith(signingKey())
-                .build()
-                .parseSignedClaims(authToken);
+            parseClaims(authToken);
             return true;
         } catch (MalformedJwtException e) {
             logger.error("Token JWT inválido: {}", e.getMessage());
@@ -95,12 +83,7 @@ public class JwtUtils {
     }
 
     public Date getExpirationDateFromJwtToken(String token) {
-        return Jwts.parser()
-                .verifyWith(signingKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+        return parseClaims(token).getExpiration();
     }
 
     private String generateToken(String username, List<String> roles) {
@@ -111,6 +94,14 @@ public class JwtUtils {
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(signingKey())
                 .compact();
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private static List<String> authoritiesToRoles(Collection<? extends GrantedAuthority> authorities) {

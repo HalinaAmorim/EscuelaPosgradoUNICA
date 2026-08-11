@@ -1,5 +1,6 @@
 package com.escuelaposgrado.Autenticacion.config;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,8 +35,8 @@ import com.escuelaposgrado.Autenticacion.security.services.UserDetailsServiceImp
 public class WebSecurityConfig {
 
     private static final List<String> CORS_ORIGINS = List.of(
-            "http://localhost:3000",
-            "http://127.0.0.1:3000");
+            CorsOrigins.LOCALHOST,
+            CorsOrigins.LOCALHOST_IP);
 
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;

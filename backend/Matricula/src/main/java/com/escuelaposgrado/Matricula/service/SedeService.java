@@ -1,8 +1,10 @@
 package com.escuelaposgrado.Matricula.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +113,9 @@ public class SedeService {
     }
 
     private List<SedeResponse> mapAll(List<Sede> sedes) {
-        return sedes.stream().map(this::convertToResponse).toList();
+        return sedes.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private SedeResponse convertToResponse(Sede sede) {

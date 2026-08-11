@@ -2,7 +2,6 @@ package com.escuelaposgrado.Matricula.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +35,11 @@ import jakarta.validation.Valid;
 @Tag(name = "Turnos de Matrícula", description = "API para gestionar turnos de matrícula")
 public class TurnoMatriculaController {
 
-    @Autowired
-    private TurnoMatriculaService turnoMatriculaService;
+    private final TurnoMatriculaService turnoMatriculaService;
+
+    public TurnoMatriculaController(TurnoMatriculaService turnoMatriculaService) {
+        this.turnoMatriculaService = turnoMatriculaService;
+    }
 
     /**
      * Obtener todos los turnos de matrícula

@@ -1,16 +1,16 @@
 package com.escuelaposgrado.Matricula.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.escuelaposgrado.Matricula.dto.request.ComisionUnidadPosgradoRequest;
 import com.escuelaposgrado.Matricula.dto.response.ComisionUnidadPosgradoResponse;
 import com.escuelaposgrado.Matricula.dto.response.nested.FacultadBasicResponse;
+import com.escuelaposgrado.Matricula.exception.BadRequestException;
 import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
 import com.escuelaposgrado.Matricula.model.entity.ComisionUnidadPosgrado;
 import com.escuelaposgrado.Matricula.model.entity.Facultad;
@@ -24,183 +24,114 @@ import com.escuelaposgrado.Matricula.repository.FacultadRepository;
 @Transactional
 public class ComisionUnidadPosgradoService {
 
-    @Autowired
-    private ComisionUnidadPosgradoRepository comisionRepository;
+    private static final ZoneId ZONE_LIMA = ZoneId.of("America/Lima");
+    private static final String MSG_COMISION_NO_ENCONTRADA = "ComisionUnidadPosgrado no encontrada con ID: ";
+    private static final String MSG_FACULTAD_NO_ENCONTRADA = "Facultad no encontrada con ID: ";
+    private static final String MSG_CODIGO_DUPLICADO = "Ya existe una comisión con el código: ";
 
-    @Autowired
-    private FacultadRepository facultadRepository;
+    private final ComisionUnidadPosgradoRepository comisionRepository;
+    private final FacultadRepository facultadRepository;
 
-    /**
-     * Obtiene todas las comisiones
-     * @return Lista de comisiones
-     */
+    public ComisionUnidadPosgradoService(ComisionUnidadPosgradoRepository comisionRepository,
+                                         FacultadRepository facultadRepository) {
+        this.comisionRepository = comisionRepository;
+        this.facultadRepository = facultadRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<ComisionUnidadPosgradoResponse> findAll() {
-        List<ComisionUnidadPosgrado> comisiones = comisionRepository.findAll();
-        List<ComisionUnidadPosgradoResponse> responses = new ArrayList<>();
-        for (ComisionUnidadPosgrado comision : comisiones) {
-            responses.add(convertToResponse(comision));
-        }
-        return responses;
+        return mapAll(comisionRepository.findAll());
     }
 
-    /**
-     * Obtiene una comisión por ID
-     * @param id ID de la comisión
-     * @return Comisión encontrada
-     * @throws ResourceNotFoundException si no se encuentra la comisión
-     */
     @Transactional(readOnly = true)
     public ComisionUnidadPosgradoResponse findById(Long id) {
-        ComisionUnidadPosgrado comision = comisionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ComisionUnidadPosgrado no encontrada con ID: " + id));
-        return convertToResponse(comision);
+        return convertToResponse(findComisionOrThrow(id));
     }
 
-    /**
-     * Obtiene comisiones por facultad
-     * @param facultadId ID de la facultad
-     * @return Lista de comisiones de la facultad
-     */
     @Transactional(readOnly = true)
     public List<ComisionUnidadPosgradoResponse> findByFacultadId(Long facultadId) {
-        List<ComisionUnidadPosgrado> comisiones = comisionRepository.findByFacultadIdAndActivoTrueOrderByNombreAsc(facultadId);
-        List<ComisionUnidadPosgradoResponse> responses = new ArrayList<>();
-        for (ComisionUnidadPosgrado comision : comisiones) {
-            responses.add(convertToResponse(comision));
-        }
-        return responses;
+        return mapAll(comisionRepository.findByFacultadIdAndActivoTrueOrderByNombreAsc(facultadId));
     }
 
-    /**
-     * Obtiene comisiones activas
-     * @return Lista de comisiones activas
-     */
     @Transactional(readOnly = true)
     public List<ComisionUnidadPosgradoResponse> findByActivoTrue() {
-        List<ComisionUnidadPosgrado> comisiones = comisionRepository.findByActivoTrueOrderByNombreAsc();
-        List<ComisionUnidadPosgradoResponse> responses = new ArrayList<>();
-        for (ComisionUnidadPosgrado comision : comisiones) {
-            responses.add(convertToResponse(comision));
-        }
-        return responses;
+        return mapAll(comisionRepository.findByActivoTrueOrderByNombreAsc());
     }
 
-    /**
-     * Busca comisiones por nombre
-     * @param nombre Nombre a buscar
-     * @return Lista de comisiones que contienen el nombre
-     */
     @Transactional(readOnly = true)
     public List<ComisionUnidadPosgradoResponse> findByNombreContaining(String nombre) {
-        // We'll implement a custom search using all comisiones
-        List<ComisionUnidadPosgrado> allComisiones = comisionRepository.findAll();
-        List<ComisionUnidadPosgrado> filteredComisiones = new ArrayList<>();
-        for (ComisionUnidadPosgrado comision : allComisiones) {
-            if (comision.getNombre().toLowerCase().contains(nombre.toLowerCase())) {
-                filteredComisiones.add(comision);
-            }
-        }
-        List<ComisionUnidadPosgradoResponse> responses = new ArrayList<>();
-        for (ComisionUnidadPosgrado comision : filteredComisiones) {
-            responses.add(convertToResponse(comision));
-        }
-        return responses;
+        String nombreLower = nombre.toLowerCase();
+        return comisionRepository.findAll().stream()
+                .filter(comision -> comision.getNombre().toLowerCase().contains(nombreLower))
+                .map(this::convertToResponse)
+                .toList();
     }
 
-    /**
-     * Crea una nueva comisión
-     * @param request Datos de la comisión a crear
-     * @return Comisión creada
-     * @throws ResourceNotFoundException si no se encuentra la facultad
-     */
     public ComisionUnidadPosgradoResponse create(ComisionUnidadPosgradoRequest request) {
-        // Validar que la facultad existe
-        Facultad facultad = facultadRepository.findById(request.getFacultadId())
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + request.getFacultadId()));
+        Facultad facultad = findFacultadOrThrow(request.getFacultadId());
+        assertUniqueCodigo(request.getCodigo());
 
-        // Validar código único
-        if (comisionRepository.findByCodigo(request.getCodigo()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe una comisión con el código: " + request.getCodigo());
-        }
-
-        // Crear nueva comisión
         ComisionUnidadPosgrado comision = new ComisionUnidadPosgrado();
         mapRequestToEntity(request, comision);
         comision.setFacultad(facultad);
-        comision.setActivo(true); // Nueva comisión activa por defecto
-        comision.setFechaCreacion(LocalDateTime.now());
-        comision.setFechaActualizacion(LocalDateTime.now());
+        comision.setActivo(true);
+        LocalDateTime now = nowLima();
+        comision.setFechaCreacion(now);
+        comision.setFechaActualizacion(now);
 
-        ComisionUnidadPosgrado savedComision = comisionRepository.save(comision);
-        return convertToResponse(savedComision);
+        return convertToResponse(comisionRepository.save(comision));
     }
 
-    /**
-     * Actualiza una comisión existente
-     * @param id ID de la comisión a actualizar
-     * @param request Nuevos datos de la comisión
-     * @return Comisión actualizada
-     * @throws ResourceNotFoundException si no se encuentra la comisión o facultad
-     */
     public ComisionUnidadPosgradoResponse update(Long id, ComisionUnidadPosgradoRequest request) {
-        // Verificar que la comisión existe
-        ComisionUnidadPosgrado existingComision = comisionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ComisionUnidadPosgrado no encontrada con ID: " + id));
+        ComisionUnidadPosgrado existingComision = findComisionOrThrow(id);
+        Facultad facultad = findFacultadOrThrow(request.getFacultadId());
 
-        // Validar que la facultad existe
-        Facultad facultad = facultadRepository.findById(request.getFacultadId())
-                .orElseThrow(() -> new ResourceNotFoundException("Facultad no encontrada con ID: " + request.getFacultadId()));
-
-        // Validar código único (excepto para la misma comisión)
-        if (!existingComision.getCodigo().equals(request.getCodigo()) &&
-            comisionRepository.findByCodigo(request.getCodigo()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe una comisión con el código: " + request.getCodigo());
+        if (!existingComision.getCodigo().equals(request.getCodigo())) {
+            assertUniqueCodigo(request.getCodigo());
         }
 
-        // Actualizar comisión
         mapRequestToEntity(request, existingComision);
         existingComision.setFacultad(facultad);
-        existingComision.setFechaActualizacion(LocalDateTime.now());
+        existingComision.setFechaActualizacion(nowLima());
 
-        ComisionUnidadPosgrado updatedComision = comisionRepository.save(existingComision);
-        return convertToResponse(updatedComision);
+        return convertToResponse(comisionRepository.save(existingComision));
     }
 
-    /**
-     * Elimina una comisión
-     * @param id ID de la comisión a eliminar
-     * @throws ResourceNotFoundException si no se encuentra la comisión
-     */
     public void delete(Long id) {
-        ComisionUnidadPosgrado comision = comisionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ComisionUnidadPosgrado no encontrada con ID: " + id));
-        comisionRepository.delete(comision);
+        comisionRepository.delete(findComisionOrThrow(id));
     }
 
-    /**
-     * Activa o desactiva una comisión
-     * @param id ID de la comisión
-     * @param activo Estado activo/inactivo
-     * @return Comisión actualizada
-     * @throws ResourceNotFoundException si no se encuentra la comisión
-     */
     public ComisionUnidadPosgradoResponse toggleActivo(Long id, Boolean activo) {
-        ComisionUnidadPosgrado comision = comisionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ComisionUnidadPosgrado no encontrada con ID: " + id));
-        
+        ComisionUnidadPosgrado comision = findComisionOrThrow(id);
         comision.setActivo(activo);
-        comision.setFechaActualizacion(LocalDateTime.now());
-        
-        ComisionUnidadPosgrado updatedComision = comisionRepository.save(comision);
-        return convertToResponse(updatedComision);
+        comision.setFechaActualizacion(nowLima());
+        return convertToResponse(comisionRepository.save(comision));
     }
 
-    /**
-     * Convierte entity a response DTO
-     * @param comision Entity a convertir
-     * @return Response DTO
-     */
+    private void assertUniqueCodigo(String codigo) {
+        if (comisionRepository.findByCodigo(codigo).isPresent()) {
+            throw new BadRequestException(MSG_CODIGO_DUPLICADO + codigo);
+        }
+    }
+
+    private LocalDateTime nowLima() {
+        return LocalDateTime.now(ZONE_LIMA);
+    }
+
+    private ComisionUnidadPosgrado findComisionOrThrow(Long id) {
+        return comisionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_COMISION_NO_ENCONTRADA + id));
+    }
+
+    private Facultad findFacultadOrThrow(Long facultadId) {
+        return facultadRepository.findById(facultadId)
+                .orElseThrow(() -> new ResourceNotFoundException(MSG_FACULTAD_NO_ENCONTRADA + facultadId));
+    }
+
+    private List<ComisionUnidadPosgradoResponse> mapAll(List<ComisionUnidadPosgrado> comisiones) {
+        return comisiones.stream().map(this::convertToResponse).toList();
+    }
+
     private ComisionUnidadPosgradoResponse convertToResponse(ComisionUnidadPosgrado comision) {
         ComisionUnidadPosgradoResponse response = new ComisionUnidadPosgradoResponse();
         response.setId(comision.getId());
@@ -217,23 +148,21 @@ public class ComisionUnidadPosgradoService {
         response.setFechaFinGestion(comision.getFechaFinGestion());
         response.setFechaCreacion(comision.getFechaCreacion());
         response.setFechaActualizacion(comision.getFechaActualizacion());
-
-        if (comision.getFacultad() != null) {
-            FacultadBasicResponse facultadResponse = new FacultadBasicResponse();
-            facultadResponse.setId(comision.getFacultad().getId());
-            facultadResponse.setNombre(comision.getFacultad().getNombre());
-            facultadResponse.setCodigo(comision.getFacultad().getCodigo());
-            response.setFacultad(facultadResponse);
-        }
-
+        response.setFacultad(toFacultadBasic(comision.getFacultad()));
         return response;
     }
 
-    /**
-     * Mapea datos del request al entity
-     * @param request Request DTO
-     * @param comision Entity a mapear
-     */
+    private FacultadBasicResponse toFacultadBasic(Facultad facultad) {
+        if (facultad == null) {
+            return null;
+        }
+        FacultadBasicResponse facultadResponse = new FacultadBasicResponse();
+        facultadResponse.setId(facultad.getId());
+        facultadResponse.setNombre(facultad.getNombre());
+        facultadResponse.setCodigo(facultad.getCodigo());
+        return facultadResponse;
+    }
+
     private void mapRequestToEntity(ComisionUnidadPosgradoRequest request, ComisionUnidadPosgrado comision) {
         comision.setNombre(request.getNombre());
         comision.setCodigo(request.getCodigo());

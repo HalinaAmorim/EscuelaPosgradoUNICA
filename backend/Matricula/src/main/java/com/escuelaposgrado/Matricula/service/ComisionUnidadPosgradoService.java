@@ -1,8 +1,9 @@
 package com.escuelaposgrado.Matricula.service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.escuelaposgrado.Matricula.dto.request.ComisionUnidadPosgradoRequest;
 import com.escuelaposgrado.Matricula.dto.response.ComisionUnidadPosgradoResponse;
 import com.escuelaposgrado.Matricula.dto.response.nested.FacultadBasicResponse;
-import com.escuelaposgrado.Matricula.exception.BadRequestException;
 import com.escuelaposgrado.Matricula.exception.ResourceNotFoundException;
 import com.escuelaposgrado.Matricula.model.entity.ComisionUnidadPosgrado;
 import com.escuelaposgrado.Matricula.model.entity.Facultad;
@@ -24,7 +24,6 @@ import com.escuelaposgrado.Matricula.repository.FacultadRepository;
 @Transactional
 public class ComisionUnidadPosgradoService {
 
-    private static final ZoneId ZONE_LIMA = ZoneId.of("America/Lima");
     private static final String MSG_COMISION_NO_ENCONTRADA = "ComisionUnidadPosgrado no encontrada con ID: ";
     private static final String MSG_FACULTAD_NO_ENCONTRADA = "Facultad no encontrada con ID: ";
     private static final String MSG_CODIGO_DUPLICADO = "Ya existe una comisión con el código: ";
@@ -64,7 +63,7 @@ public class ComisionUnidadPosgradoService {
         return comisionRepository.findAll().stream()
                 .filter(comision -> comision.getNombre().toLowerCase().contains(nombreLower))
                 .map(this::convertToResponse)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public ComisionUnidadPosgradoResponse create(ComisionUnidadPosgradoRequest request) {
@@ -75,9 +74,8 @@ public class ComisionUnidadPosgradoService {
         mapRequestToEntity(request, comision);
         comision.setFacultad(facultad);
         comision.setActivo(true);
-        LocalDateTime now = nowLima();
-        comision.setFechaCreacion(now);
-        comision.setFechaActualizacion(now);
+        comision.setFechaCreacion(LocalDateTime.now());
+        comision.setFechaActualizacion(LocalDateTime.now());
 
         return convertToResponse(comisionRepository.save(comision));
     }
@@ -92,7 +90,7 @@ public class ComisionUnidadPosgradoService {
 
         mapRequestToEntity(request, existingComision);
         existingComision.setFacultad(facultad);
-        existingComision.setFechaActualizacion(nowLima());
+        existingComision.setFechaActualizacion(LocalDateTime.now());
 
         return convertToResponse(comisionRepository.save(existingComision));
     }
@@ -104,18 +102,14 @@ public class ComisionUnidadPosgradoService {
     public ComisionUnidadPosgradoResponse toggleActivo(Long id, Boolean activo) {
         ComisionUnidadPosgrado comision = findComisionOrThrow(id);
         comision.setActivo(activo);
-        comision.setFechaActualizacion(nowLima());
+        comision.setFechaActualizacion(LocalDateTime.now());
         return convertToResponse(comisionRepository.save(comision));
     }
 
     private void assertUniqueCodigo(String codigo) {
         if (comisionRepository.findByCodigo(codigo).isPresent()) {
-            throw new BadRequestException(MSG_CODIGO_DUPLICADO + codigo);
+            throw new IllegalArgumentException(MSG_CODIGO_DUPLICADO + codigo);
         }
-    }
-
-    private LocalDateTime nowLima() {
-        return LocalDateTime.now(ZONE_LIMA);
     }
 
     private ComisionUnidadPosgrado findComisionOrThrow(Long id) {
@@ -129,7 +123,9 @@ public class ComisionUnidadPosgradoService {
     }
 
     private List<ComisionUnidadPosgradoResponse> mapAll(List<ComisionUnidadPosgrado> comisiones) {
-        return comisiones.stream().map(this::convertToResponse).toList();
+        return comisiones.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private ComisionUnidadPosgradoResponse convertToResponse(ComisionUnidadPosgrado comision) {

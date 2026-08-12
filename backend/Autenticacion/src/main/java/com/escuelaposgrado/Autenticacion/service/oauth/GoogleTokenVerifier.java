@@ -17,6 +17,10 @@ public class GoogleTokenVerifier {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleTokenVerifier.class);
     private static final String GOOGLE_API_BASE = "https://www.googleapis.com";
+    private static final String USERINFO_PATH = "/oauth2/v2/userinfo";
+    private static final String TOKENINFO_PATH = "/oauth2/v3/tokeninfo";
+    private static final String ACCESS_TOKEN_PARAM = "access_token";
+    private static final String ID_TOKEN_PARAM = "id_token";
 
     private final WebClient webClient;
     private final String googleClientId;
@@ -36,14 +40,7 @@ public class GoogleTokenVerifier {
 
     private GoogleUserInfo tryVerifyAsAccessToken(String token) {
         try {
-            GoogleUserInfo userInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                    .path("/oauth2/v2/userinfo")
-                    .queryParam("access_token", token)
-                    .build())
-                .retrieve()
-                .bodyToMono(GoogleUserInfo.class)
-                .block();
+            GoogleUserInfo userInfo = fetchUserInfo(USERINFO_PATH, ACCESS_TOKEN_PARAM, token);
             if (userInfo != null) {
                 logger.debug("Token verificado como access_token: {}", userInfo.getEmail());
             }
@@ -56,14 +53,7 @@ public class GoogleTokenVerifier {
 
     private GoogleUserInfo tryVerifyAsIdToken(String token) {
         try {
-            GoogleUserInfo userInfo = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                    .path("/oauth2/v3/tokeninfo")
-                    .queryParam("id_token", token)
-                    .build())
-                .retrieve()
-                .bodyToMono(GoogleUserInfo.class)
-                .block();
+            GoogleUserInfo userInfo = fetchUserInfo(TOKENINFO_PATH, ID_TOKEN_PARAM, token);
             if (userInfo == null) {
                 return null;
             }
@@ -77,6 +67,17 @@ public class GoogleTokenVerifier {
             logger.debug("Fallo verificación como id_token: {}", e.getMessage());
             return null;
         }
+    }
+
+    private GoogleUserInfo fetchUserInfo(String path, String queryParam, String token) {
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path(path)
+                .queryParam(queryParam, token)
+                .build())
+            .retrieve()
+            .bodyToMono(GoogleUserInfo.class)
+            .block();
     }
 
     private boolean isAudienceValid(GoogleUserInfo userInfo) {

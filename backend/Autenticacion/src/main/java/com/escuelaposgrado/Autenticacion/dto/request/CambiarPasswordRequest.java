@@ -10,21 +10,24 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "Datos requeridos para cambiar la contraseña del usuario")
 public class CambiarPasswordRequest {
 
-    @Schema(description = "Contraseña actual del usuario", example = "password123", required = true)
+    @Schema(description = "Contraseña actual del usuario", example = "password123",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "La contraseña actual es obligatoria")
     private String passwordActual;
 
-    @Schema(description = "Nueva contraseña (mínimo 6 caracteres)", example = "nuevaPassword123", required = true)
+    @Schema(description = "Nueva contraseña (mínimo 6 caracteres)", example = "nuevaPassword123",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "La nueva contraseña es obligatoria")
     @Size(min = 6, message = "La nueva contraseña debe tener al menos 6 caracteres")
     private String nuevaPassword;
 
-    @Schema(description = "Confirmar nueva contraseña", example = "nuevaPassword123", required = true)
+    @Schema(description = "Confirmar nueva contraseña", example = "nuevaPassword123",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "La confirmación de la nueva contraseña es obligatoria")
     private String confirmarNuevaPassword;
 
-    // Constructores
-    public CambiarPasswordRequest() {}
+    public CambiarPasswordRequest() {
+    }
 
     public CambiarPasswordRequest(String passwordActual, String nuevaPassword, String confirmarNuevaPassword) {
         this.passwordActual = passwordActual;
@@ -32,7 +35,6 @@ public class CambiarPasswordRequest {
         this.confirmarNuevaPassword = confirmarNuevaPassword;
     }
 
-    // Getters y Setters
     public String getPasswordActual() {
         return passwordActual;
     }
@@ -57,9 +59,6 @@ public class CambiarPasswordRequest {
         this.confirmarNuevaPassword = confirmarNuevaPassword;
     }
 
-    /**
-     * Valida que las nuevas contraseñas coincidan
-     */
     public boolean isPasswordValid() {
         return nuevaPassword != null && nuevaPassword.equals(confirmarNuevaPassword);
     }

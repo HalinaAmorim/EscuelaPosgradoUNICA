@@ -23,7 +23,12 @@ public class UsuarioDtoMapper {
             usuario.getApellidos(),
             usuario.getRole()
         );
-        copyProfileFields(usuario, response);
+        response.setDni(usuario.getDni());
+        response.setTelefono(usuario.getTelefono());
+        response.setDireccion(usuario.getDireccion());
+        response.setUltimoAcceso(usuario.getUltimoAcceso());
+        copyRoleSpecificFields(usuario, response::setCodigoEstudiante, response::setCodigoDocente,
+                response::setEspecialidad, response::setProgramaInteres);
         return response;
     }
 
@@ -41,21 +46,20 @@ public class UsuarioDtoMapper {
         response.setActivo(usuario.getActivo());
         response.setFechaCreacion(usuario.getFechaCreacion());
         response.setUltimoAcceso(usuario.getUltimoAcceso());
-        response.setCodigoEstudiante(usuario.getCodigoEstudiante());
-        response.setCodigoDocente(usuario.getCodigoDocente());
-        response.setEspecialidad(usuario.getEspecialidad());
-        response.setProgramaInteres(usuario.getProgramaInteres());
+        copyRoleSpecificFields(usuario, response::setCodigoEstudiante, response::setCodigoDocente,
+                response::setEspecialidad, response::setProgramaInteres);
         return response;
     }
 
-    private void copyProfileFields(Usuario usuario, AuthResponse response) {
-        response.setDni(usuario.getDni());
-        response.setTelefono(usuario.getTelefono());
-        response.setDireccion(usuario.getDireccion());
-        response.setUltimoAcceso(usuario.getUltimoAcceso());
-        response.setCodigoEstudiante(usuario.getCodigoEstudiante());
-        response.setCodigoDocente(usuario.getCodigoDocente());
-        response.setEspecialidad(usuario.getEspecialidad());
-        response.setProgramaInteres(usuario.getProgramaInteres());
+    private void copyRoleSpecificFields(
+            Usuario usuario,
+            java.util.function.Consumer<String> codigoEstudiante,
+            java.util.function.Consumer<String> codigoDocente,
+            java.util.function.Consumer<String> especialidad,
+            java.util.function.Consumer<String> programaInteres) {
+        codigoEstudiante.accept(usuario.getCodigoEstudiante());
+        codigoDocente.accept(usuario.getCodigoDocente());
+        especialidad.accept(usuario.getEspecialidad());
+        programaInteres.accept(usuario.getProgramaInteres());
     }
 }

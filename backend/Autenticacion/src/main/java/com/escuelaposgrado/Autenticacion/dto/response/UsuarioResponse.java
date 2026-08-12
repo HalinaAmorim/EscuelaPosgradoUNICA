@@ -9,6 +9,8 @@ import com.escuelaposgrado.Autenticacion.model.enums.Role;
  */
 public class UsuarioResponse {
 
+    private static final String NAME_SEPARATOR = " ";
+
     private Long id;
     private String username;
     private String email;
@@ -22,16 +24,11 @@ public class UsuarioResponse {
     private LocalDateTime fechaCreacion;
     private LocalDateTime ultimoAcceso;
 
-    // Campos adicionales según el rol
     private String codigoEstudiante;
     private String codigoDocente;
     private String especialidad;
     private String programaInteres;
 
-    // Constructores
-    public UsuarioResponse() {}
-
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -161,6 +158,6 @@ public class UsuarioResponse {
     }
 
     public String getNombreCompleto() {
-        return nombres + " " + apellidos;
+        return nombres + NAME_SEPARATOR + apellidos;
     }
 }

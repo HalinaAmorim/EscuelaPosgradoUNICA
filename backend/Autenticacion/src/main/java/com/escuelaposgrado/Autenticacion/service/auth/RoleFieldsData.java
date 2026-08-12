@@ -30,7 +30,7 @@ public final class RoleFieldsData {
     }
 
     public static RoleFieldsData from(RegistroRequest request) {
-        return new RoleFieldsData(
+        return of(
             request.getRole(),
             request.getCodigoEstudiante(),
             request.getCodigoDocente(),
@@ -40,13 +40,22 @@ public final class RoleFieldsData {
     }
 
     public static RoleFieldsData from(ActualizarUsuarioAdminRequest request) {
-        return new RoleFieldsData(
+        return of(
             request.getRole(),
             request.getCodigoEstudiante(),
             request.getCodigoDocente(),
             request.getEspecialidad(),
             request.getProgramaInteres()
         );
+    }
+
+    private static RoleFieldsData of(
+            Role role,
+            String codigoEstudiante,
+            String codigoDocente,
+            String especialidad,
+            String programaInteres) {
+        return new RoleFieldsData(role, codigoEstudiante, codigoDocente, especialidad, programaInteres);
     }
 
     public Role getRole() {

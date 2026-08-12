@@ -33,6 +33,11 @@ import jakarta.validation.constraints.Size;
 @Table(name = "usuarios")
 public class Usuario implements UserDetails {
 
+    private static final String ACTIVE_STATUS = "ACTIVO";
+    private static final String EMPTY_TEXT = "";
+    private static final String NAME_SEPARATOR = " ";
+    private static final String SURNAME_SPLIT_REGEX = "\\s+";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -80,7 +85,7 @@ public class Usuario implements UserDetails {
     private Boolean activo = true;
 
     @Column(nullable = false, length = 20)
-    private String estado = "ACTIVO"; // Estado del usuario (ACTIVO, INACTIVO, SUSPENDIDO)
+    private String estado = ACTIVE_STATUS;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
@@ -91,24 +96,22 @@ public class Usuario implements UserDetails {
     @Column(name = "ultimo_acceso")
     private LocalDateTime ultimoAcceso;
 
-    // Información adicional según el rol
     @Column(name = "codigo_estudiante", unique = true)
-    private String codigoEstudiante; // Para ALUMNO y POSTULANTE
+    private String codigoEstudiante;
 
     @Column(name = "codigo_docente", unique = true)
-    private String codigoDocente; // Para DOCENTE y COORDINADOR
+    private String codigoDocente;
 
     @Column(name = "especialidad")
-    private String especialidad; // Para DOCENTE
+    private String especialidad;
 
     @Column(name = "programa_interes")
-    private String programaInteres; // Para POSTULANTE
+    private String programaInteres;
 
-    // Constructores
     public Usuario() {
         this.fechaCreacion = LocalDateTime.now();
         this.activo = true;
-        this.estado = "ACTIVO";
+        this.estado = ACTIVE_STATUS;
     }
 
     public Usuario(String username, String email, String password, String nombres, 
@@ -123,8 +126,7 @@ public class Usuario implements UserDetails {
         this.role = role;
     }
 
-    // Constructor de compatibilidad con apellidos combinados
-    public Usuario(String username, String email, String password, String nombres, 
+    public Usuario(String username, String email, String password, String nombres,
                    String apellidosCompletos, Role role) {
         this();
         this.username = username;
@@ -132,19 +134,12 @@ public class Usuario implements UserDetails {
         this.password = password;
         this.nombres = nombres;
         this.role = role;
-        
-        // Dividir apellidos completos en paterno y materno
-        if (apellidosCompletos != null && !apellidosCompletos.trim().isEmpty()) {
-            String[] apellidosArray = apellidosCompletos.trim().split("\\s+", 2);
-            this.apellidoPaterno = apellidosArray[0];
-            this.apellidoMaterno = apellidosArray.length > 1 ? apellidosArray[1] : "";
-        }
+        assignApellidos(apellidosCompletos, false);
     }
 
-    // Métodos de UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority(role.asAuthority()));
     }
 
     @Override
@@ -159,25 +154,28 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return activo;
+        return isActive();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return activo;
+        return isActive();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return activo;
+        return isActive();
     }
 
     @Override
     public boolean isEnabled() {
+        return isActive();
+    }
+
+    private boolean isActive() {
         return activo;
     }
 
-    // Métodos de ciclo de vida JPA
     @PrePersist
     protected void onCreate() {
         fechaCreacion = LocalDateTime.now();
@@ -188,7 +186,6 @@ public class Usuario implements UserDetails {
         fechaActualizacion = LocalDateTime.now();
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -237,27 +234,33 @@ public class Usuario implements UserDetails {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    // Método de compatibilidad para obtener apellidos completos
     @Transient
     public String getApellidos() {
-        String resultado = apellidoPaterno != null ? apellidoPaterno : "";
-        if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
-            resultado += " " + apellidoMaterno;
+        String resultado = apellidoPaterno != null ? apellidoPaterno : EMPTY_TEXT;
+        if (hasText(apellidoMaterno)) {
+            resultado += NAME_SEPARATOR + apellidoMaterno;
         }
         return resultado.trim();
     }
 
-    // Método de compatibilidad para establecer apellidos completos
     @Transient
     public void setApellidos(String apellidosCompletos) {
-        if (apellidosCompletos != null && !apellidosCompletos.trim().isEmpty()) {
-            String[] apellidosArray = apellidosCompletos.trim().split("\\s+", 2);
+        assignApellidos(apellidosCompletos, true);
+    }
+
+    private void assignApellidos(String apellidosCompletos, boolean clearWhenBlank) {
+        if (hasText(apellidosCompletos)) {
+            String[] apellidosArray = apellidosCompletos.trim().split(SURNAME_SPLIT_REGEX, 2);
             this.apellidoPaterno = apellidosArray[0];
-            this.apellidoMaterno = apellidosArray.length > 1 ? apellidosArray[1] : "";
-        } else {
-            this.apellidoPaterno = "";
-            this.apellidoMaterno = "";
+            this.apellidoMaterno = apellidosArray.length > 1 ? apellidosArray[1] : EMPTY_TEXT;
+        } else if (clearWhenBlank) {
+            this.apellidoPaterno = EMPTY_TEXT;
+            this.apellidoMaterno = EMPTY_TEXT;
         }
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     public String getDni() {
@@ -365,6 +368,6 @@ public class Usuario implements UserDetails {
     }
 
     public String getNombreCompleto() {
-        return nombres + " " + getApellidos();
+        return nombres + NAME_SEPARATOR + getApellidos();
     }
 }

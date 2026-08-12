@@ -9,23 +9,24 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "Datos requeridos para el login de usuario")
 public class LoginRequest {
 
-    @Schema(description = "Nombre de usuario o email", example = "admin", required = true)
+    @Schema(description = "Nombre de usuario o email", example = "admin",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "El username o email es obligatorio")
     private String usernameOrEmail;
 
-    @Schema(description = "Contraseña del usuario", example = "admin123", required = true)
+    @Schema(description = "Contraseña del usuario", example = "admin123",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
-    // Constructores
-    public LoginRequest() {}
+    public LoginRequest() {
+    }
 
     public LoginRequest(String usernameOrEmail, String password) {
         this.usernameOrEmail = usernameOrEmail;
         this.password = password;
     }
 
-    // Getters y Setters
     public String getUsernameOrEmail() {
         return usernameOrEmail;
     }

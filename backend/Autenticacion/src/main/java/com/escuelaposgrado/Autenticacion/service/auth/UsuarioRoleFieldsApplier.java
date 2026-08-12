@@ -1,5 +1,7 @@
 package com.escuelaposgrado.Autenticacion.service.auth;
 
+import java.util.function.Consumer;
+
 import org.springframework.stereotype.Component;
 
 import com.escuelaposgrado.Autenticacion.model.entity.Usuario;
@@ -24,7 +26,9 @@ public class UsuarioRoleFieldsApplier {
             case ALUMNO -> applyEstudianteFields(usuario, fields, false);
             case POSTULANTE -> applyEstudianteFields(usuario, fields, true);
             case DOCENTE, COORDINADOR -> applyDocenteFields(usuario, fields);
-            case ADMIN -> { /* sem campos adicionais */ }
+            case ADMIN -> {
+                // Sem campos adicionales para administrador
+            }
         }
     }
 
@@ -47,9 +51,13 @@ public class UsuarioRoleFieldsApplier {
         setIfPresent(fields.getEspecialidad(), usuario::setEspecialidad);
     }
 
-    private void setIfPresent(String value, java.util.function.Consumer<String> setter) {
-        if (value != null && !value.trim().isEmpty()) {
+    private void setIfPresent(String value, Consumer<String> setter) {
+        if (hasText(value)) {
             setter.accept(value.trim());
         }
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

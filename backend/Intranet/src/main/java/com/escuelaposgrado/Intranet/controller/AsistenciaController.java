@@ -5,7 +5,6 @@ import com.escuelaposgrado.Intranet.service.AsistenciaService;
 import com.escuelaposgrado.Intranet.security.jwt.JwtUtils;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +21,14 @@ import java.util.List;
 @RequestMapping("/api/asistencias")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class AsistenciaController {
-    
-    @Autowired
-    private AsistenciaService asistenciaService;
-    
-    @Autowired
-    private JwtUtils jwtUtils;
+
+    private final AsistenciaService asistenciaService;
+    private final JwtUtils jwtUtils;
+
+    public AsistenciaController(AsistenciaService asistenciaService, JwtUtils jwtUtils) {
+        this.asistenciaService = asistenciaService;
+        this.jwtUtils = jwtUtils;
+    }
     
     /**
      * Registrar nueva asistencia
@@ -38,9 +39,7 @@ public class AsistenciaController {
             @Valid @RequestBody AsistenciaDTO asistenciaDTO,
             @RequestHeader("Authorization") String token) {
         try {
-            String jwt = token.substring(7);
-            String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            
+            String username = extractUsername(token);
             AsistenciaDTO nuevaAsistencia = asistenciaService.registrarAsistencia(asistenciaDTO, username);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaAsistencia);
         } catch (RuntimeException e) {
@@ -192,6 +191,10 @@ public class AsistenciaController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MensajeResponse("Error: " + e.getMessage()));
         }
+    }
+
+    private String extractUsername(String authorizationHeader) {
+        return jwtUtils.getUserNameFromJwtToken(authorizationHeader.substring(7));
     }
 }
 

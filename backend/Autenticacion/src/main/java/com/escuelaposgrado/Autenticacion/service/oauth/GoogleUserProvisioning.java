@@ -21,6 +21,10 @@ import com.escuelaposgrado.Autenticacion.service.auth.AuthMessages;
 public class GoogleUserProvisioning {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleUserProvisioning.class);
+    private static final String GOOGLE_PASSWORD_PREFIX = "GOOGLE_OAUTH_";
+    private static final String STUDENT_CODE_PREFIX = "EST";
+    private static final String EMPTY_TEXT = "";
+    private static final String EMAIL_SEPARATOR = "@";
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder encoder;
@@ -66,7 +70,7 @@ public class GoogleUserProvisioning {
         nuevoUsuario.setEmail(googleUser.getEmail());
         nuevoUsuario.setNombres(nullToEmpty(googleUser.getGivenName()));
         nuevoUsuario.setApellidos(nullToEmpty(googleUser.getFamilyName()));
-        nuevoUsuario.setPassword(encoder.encode("GOOGLE_OAUTH_" + System.currentTimeMillis()));
+        nuevoUsuario.setPassword(encoder.encode(GOOGLE_PASSWORD_PREFIX + System.currentTimeMillis()));
 
         Role userRole = determineRoleFromEmail(googleUser.getEmail());
         nuevoUsuario.setRole(userRole);
@@ -82,7 +86,7 @@ public class GoogleUserProvisioning {
     }
 
     private String generateUsernameFromEmail(String email) {
-        String baseUsername = email.substring(0, email.indexOf('@'));
+        String baseUsername = emailLocalPart(email);
         String username = baseUsername;
         int counter = 1;
         while (usuarioRepository.existsByUsername(username)) {
@@ -93,7 +97,7 @@ public class GoogleUserProvisioning {
     }
 
     private Role determineRoleFromEmail(String email) {
-        String localPart = email.substring(0, email.indexOf('@')).toLowerCase();
+        String localPart = emailLocalPart(email).toLowerCase();
         if (containsAny(localPart, "admin", "administrador")) {
             return Role.ADMIN;
         }
@@ -111,7 +115,7 @@ public class GoogleUserProvisioning {
 
     private String generateCodigoEstudiante() {
         int year = AppClock.now().getYear();
-        String prefix = "EST" + year;
+        String prefix = STUDENT_CODE_PREFIX + year;
         long studentCount = usuarioRepository.countByRole(Role.ALUMNO);
         String codigoEstudiante;
         int counter = 1;
@@ -120,6 +124,10 @@ public class GoogleUserProvisioning {
             counter++;
         } while (usuarioRepository.findByCodigoEstudiante(codigoEstudiante).isPresent());
         return codigoEstudiante;
+    }
+
+    private String emailLocalPart(String email) {
+        return email.substring(0, email.indexOf(EMAIL_SEPARATOR));
     }
 
     private boolean containsAny(String value, String... fragments) {
@@ -136,6 +144,6 @@ public class GoogleUserProvisioning {
     }
 
     private String nullToEmpty(String value) {
-        return value != null ? value : "";
+        return value != null ? value : EMPTY_TEXT;
     }
 }

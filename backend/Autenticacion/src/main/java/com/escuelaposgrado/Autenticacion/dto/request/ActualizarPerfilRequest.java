@@ -26,15 +26,14 @@ public class ActualizarPerfilRequest {
     @Schema(description = "Confirmar nueva contraseña", example = "nuevaPassword123")
     private String confirmarPassword;
 
-    // Constructores
-    public ActualizarPerfilRequest() {}
+    public ActualizarPerfilRequest() {
+    }
 
     public ActualizarPerfilRequest(String telefono, String direccion) {
         this.telefono = telefono;
         this.direccion = direccion;
     }
 
-    // Getters y Setters
     public String getTelefono() {
         return telefono;
     }
@@ -67,20 +66,15 @@ public class ActualizarPerfilRequest {
         this.confirmarPassword = confirmarPassword;
     }
 
-    /**
-     * Valida que las contraseñas coincidan
-     */
     public boolean isPasswordValid() {
-        if (password == null || password.trim().isEmpty()) {
-            return true; // No se está actualizando la contraseña
-        }
-        return password.equals(confirmarPassword);
+        return !isUpdatingPassword() || password.equals(confirmarPassword);
     }
 
-    /**
-     * Verifica si se va a actualizar la contraseña
-     */
     public boolean isUpdatingPassword() {
-        return password != null && !password.trim().isEmpty();
+        return hasText(password);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

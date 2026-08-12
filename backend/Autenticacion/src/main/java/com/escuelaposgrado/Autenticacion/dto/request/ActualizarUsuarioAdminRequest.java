@@ -15,21 +15,25 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "Datos que el administrador puede actualizar de un usuario")
 public class ActualizarUsuarioAdminRequest {
 
-    @Schema(description = "Nombre de usuario único", example = "juan.perez", required = true)
+    @Schema(description = "Nombre de usuario único", example = "juan.perez",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "El nombre de usuario es obligatorio")
     @Size(min = 3, max = 50, message = "El nombre de usuario debe tener entre 3 y 50 caracteres")
     private String username;
 
-    @Schema(description = "Correo electrónico institucional", example = "juan.perez@unica.edu.pe", required = true)
+    @Schema(description = "Correo electrónico institucional", example = "juan.perez@unica.edu.pe",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe tener un formato válido")
     private String email;
 
-    @Schema(description = "Nombres del usuario", example = "Juan Carlos", required = true)
+    @Schema(description = "Nombres del usuario", example = "Juan Carlos",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "El nombre es obligatorio")
     private String nombres;
 
-    @Schema(description = "Apellidos del usuario", example = "Pérez García", required = true)
+    @Schema(description = "Apellidos del usuario", example = "Pérez García",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Los apellidos son obligatorios")
     private String apellidos;
 
@@ -44,7 +48,8 @@ public class ActualizarUsuarioAdminRequest {
     @Size(max = 500, message = "La dirección no puede tener más de 500 caracteres")
     private String direccion;
 
-    @Schema(description = "Rol del usuario", example = "ALUMNO", required = true)
+    @Schema(description = "Rol del usuario", example = "ALUMNO",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "El rol es obligatorio")
     private Role role;
 
@@ -64,10 +69,6 @@ public class ActualizarUsuarioAdminRequest {
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
-    // Constructores
-    public ActualizarUsuarioAdminRequest() {}
-
-    // Getters y Setters
     public String getUsername() {
         return username;
     }
@@ -172,10 +173,11 @@ public class ActualizarUsuarioAdminRequest {
         this.password = password;
     }
 
-    /**
-     * Verifica si se va a actualizar la contraseña
-     */
     public boolean isUpdatingPassword() {
-        return password != null && !password.trim().isEmpty();
+        return hasText(password);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

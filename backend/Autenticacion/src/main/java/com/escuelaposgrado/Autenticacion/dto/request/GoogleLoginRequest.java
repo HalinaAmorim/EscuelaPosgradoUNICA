@@ -9,18 +9,20 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "Datos requeridos para el login con Google OAuth")
 public class GoogleLoginRequest {
 
-    @Schema(description = "Token de Google OAuth obtenido del frontend", example = "eyJhbGciOiJSUzI1NiIsImtpZCI6...", required = true)
+    @Schema(
+            description = "Token de Google OAuth obtenido del frontend",
+            example = "eyJhbGciOiJSUzI1NiIsImtpZCI6...",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "El token de Google es obligatorio")
     private String googleToken;
 
-    // Constructores
-    public GoogleLoginRequest() {}
+    public GoogleLoginRequest() {
+    }
 
     public GoogleLoginRequest(String googleToken) {
         this.googleToken = googleToken;
     }
 
-    // Getters y Setters
     public String getGoogleToken() {
         return googleToken;
     }

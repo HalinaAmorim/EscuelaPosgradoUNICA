@@ -7,7 +7,6 @@ import com.escuelaposgrado.Intranet.security.jwt.JwtUtils;
 import com.escuelaposgrado.Intranet.service.UsuarioService;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,15 +22,19 @@ import java.util.Map;
 @RequestMapping("/api/encuestas")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class EncuestaController {
-    
-    @Autowired
-    private EncuestaService encuestaService;
-    
-    @Autowired
-    private UsuarioService usuarioService;
-    
-    @Autowired
-    private JwtUtils jwtUtils;
+
+    private final EncuestaService encuestaService;
+    private final UsuarioService usuarioService;
+    private final JwtUtils jwtUtils;
+
+    public EncuestaController(
+            EncuestaService encuestaService,
+            UsuarioService usuarioService,
+            JwtUtils jwtUtils) {
+        this.encuestaService = encuestaService;
+        this.usuarioService = usuarioService;
+        this.jwtUtils = jwtUtils;
+    }
     
     /**
      * Crear nueva encuesta
@@ -42,9 +45,7 @@ public class EncuestaController {
             @Valid @RequestBody EncuestaDTO encuestaDTO,
             @RequestHeader("Authorization") String token) {
         try {
-            String jwt = token.substring(7);
-            String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            
+            String username = extractUsername(token);
             EncuestaDTO nuevaEncuesta = encuestaService.crearEncuesta(encuestaDTO, username);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaEncuesta);
         } catch (RuntimeException e) {
@@ -94,10 +95,7 @@ public class EncuestaController {
             @RequestBody Map<Long, String> respuestas,
             @RequestHeader("Authorization") String token) {
         try {
-            String jwt = token.substring(7);
-            String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            
-            // Obtener el usuario actual por username
+            String username = extractUsername(token);
             var usuarioOptional = usuarioService.obtenerUsuarioEntidadPorEmail(username);
             if (usuarioOptional.isEmpty()) {
                 return ResponseEntity.badRequest().body(new MensajeResponse("Usuario no encontrado"));
@@ -217,5 +215,9 @@ public class EncuestaController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MensajeResponse("Error: " + e.getMessage()));
         }
+    }
+
+    private String extractUsername(String authorizationHeader) {
+        return jwtUtils.getUserNameFromJwtToken(authorizationHeader.substring(7));
     }
 }

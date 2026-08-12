@@ -9,8 +9,11 @@ import com.escuelaposgrado.Autenticacion.model.enums.Role;
  */
 public class AuthResponse {
 
+    private static final String TOKEN_TYPE_BEARER = "Bearer";
+    private static final String NAME_SEPARATOR = " ";
+
     private String token;
-    private String type = "Bearer";
+    private String type = TOKEN_TYPE_BEARER;
     private Long id;
     private String username;
     private String email;
@@ -22,17 +25,16 @@ public class AuthResponse {
     private Role role;
     private LocalDateTime ultimoAcceso;
 
-    // Campos adicionales según el rol
     private String codigoEstudiante;
     private String codigoDocente;
     private String especialidad;
     private String programaInteres;
 
-    // Constructores
-    public AuthResponse() {}
+    public AuthResponse() {
+    }
 
-    public AuthResponse(String token, Long id, String username, String email, 
-                       String nombres, String apellidos, Role role) {
+    public AuthResponse(String token, Long id, String username, String email,
+                        String nombres, String apellidos, Role role) {
         this.token = token;
         this.id = id;
         this.username = username;
@@ -42,7 +44,6 @@ public class AuthResponse {
         this.role = role;
     }
 
-    // Getters y Setters
     public String getToken() {
         return token;
     }
@@ -172,6 +173,6 @@ public class AuthResponse {
     }
 
     public String getNombreCompleto() {
-        return nombres + " " + apellidos;
+        return nombres + NAME_SEPARATOR + apellidos;
     }
 }

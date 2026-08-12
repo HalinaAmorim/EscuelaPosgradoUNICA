@@ -5,6 +5,7 @@ import com.escuelaposgrado.Intranet.service.CalificacionService;
 import com.escuelaposgrado.Intranet.security.jwt.JwtUtils;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,14 +21,12 @@ import java.util.List;
 @RequestMapping("/api/calificaciones")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class CalificacionController {
-
-    private final CalificacionService calificacionService;
-    private final JwtUtils jwtUtils;
-
-    public CalificacionController(CalificacionService calificacionService, JwtUtils jwtUtils) {
-        this.calificacionService = calificacionService;
-        this.jwtUtils = jwtUtils;
-    }
+    
+    @Autowired
+    private CalificacionService calificacionService;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
     
     /**
      * Registrar nueva calificación
@@ -38,7 +37,9 @@ public class CalificacionController {
             @Valid @RequestBody CalificacionDTO calificacionDTO,
             @RequestHeader("Authorization") String token) {
         try {
-            String username = extractUsername(token);
+            String jwt = token.substring(7);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            
             CalificacionDTO nuevaCalificacion = calificacionService.registrarCalificacion(calificacionDTO, username);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCalificacion);
         } catch (RuntimeException e) {
@@ -72,7 +73,9 @@ public class CalificacionController {
             @RequestBody CorreccionRequest request,
             @RequestHeader("Authorization") String token) {
         try {
-            String username = extractUsername(token);
+            String jwt = token.substring(7);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            
             CalificacionDTO calificacionCorregida = calificacionService.corregirCalificacion(
                 id, request.getNuevaNota(), request.getMotivo(), username);
             return ResponseEntity.ok(calificacionCorregida);
@@ -225,10 +228,6 @@ public class CalificacionController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MensajeResponse("Error: " + e.getMessage()));
         }
-    }
-
-    private String extractUsername(String authorizationHeader) {
-        return jwtUtils.getUserNameFromJwtToken(authorizationHeader.substring(7));
     }
 }
 

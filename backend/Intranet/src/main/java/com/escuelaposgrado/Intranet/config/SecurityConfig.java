@@ -2,6 +2,7 @@ package com.escuelaposgrado.Intranet.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.escuelaposgrado.Intranet.security.jwt.AuthEntryPointJwt;
 import com.escuelaposgrado.Intranet.security.jwt.AuthTokenFilter;
-import com.escuelaposgrado.Intranet.security.jwt.JwtUtils;
 import com.escuelaposgrado.Intranet.security.services.UserDetailsServiceImpl;
 
 /**
@@ -33,18 +33,11 @@ import com.escuelaposgrado.Intranet.security.services.UserDetailsServiceImpl;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final AuthEntryPointJwt unauthorizedHandler;
-    private final UserDetailsServiceImpl userDetailsService;
-    private final JwtUtils jwtUtils;
-
-    public SecurityConfig(
-            AuthEntryPointJwt unauthorizedHandler,
-            UserDetailsServiceImpl userDetailsService,
-            JwtUtils jwtUtils) {
-        this.unauthorizedHandler = unauthorizedHandler;
-        this.userDetailsService = userDetailsService;
-        this.jwtUtils = jwtUtils;
-    }
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+    
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -78,7 +71,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter(jwtUtils);
+        return new AuthTokenFilter();
     }
 
     @Bean

@@ -1,6 +1,5 @@
 package com.escuelaposgrado.Intranet.security.jwt;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -12,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -20,41 +18,61 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 
 /**
- * Utilidad para emitir y validar tokens JWT en el microservicio de Intranet.
+ * Utilidad para validar tokens JWT en el microservicio de Intranet
  */
 @Component
 public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-    private static final String DEFAULT_SECRET = "escuelaPosgradoUnicaSecretKey2024JWTAuthentication";
 
-    private final String jwtSecret;
-    private final int jwtExpirationMs;
+    @Value("${app.jwtSecret:escuelaPosgradoUnicaSecretKey2024JWTAuthentication}")
+    private String jwtSecret;
 
-    public JwtUtils(
-            @Value("${app.jwtSecret:" + DEFAULT_SECRET + "}") String jwtSecret,
-            @Value("${app.jwtExpirationMs:86400000}") int jwtExpirationMs) {
-        this.jwtSecret = jwtSecret;
-        this.jwtExpirationMs = jwtExpirationMs;
-    }
+    @Value("${app.jwtExpirationMs:86400000}")
+    private int jwtExpirationMs;
 
+    /**
+     * Generar token JWT
+     */
     public String generateJwtToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(signingKey())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key)
                 .compact();
     }
 
+    /**
+     * Obtener username del token JWT
+     */
     public String getUserNameFromJwtToken(String token) {
-        return parseClaims(token).getSubject();
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 
+    /**
+     * Validar token JWT
+     */
     public boolean validateJwtToken(String authToken) {
         try {
-            parseClaims(authToken);
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            
+            Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(authToken);
+            
             return true;
         } catch (MalformedJwtException e) {
             logger.error("Token JWT inválido: {}", e.getMessage());
@@ -67,22 +85,21 @@ public class JwtUtils {
         } catch (Exception e) {
             logger.error("Error validando token JWT: {}", e.getMessage());
         }
+        
         return false;
     }
 
+    /**
+     * Obtener fecha de expiración del token
+     */
     public Date getExpirationDateFromJwtToken(String token) {
-        return parseClaims(token).getExpiration();
-    }
-
-    private Claims parseClaims(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        
         return Jwts.parser()
-                .verifyWith(signingKey())
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    private SecretKey signingKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+                .getPayload()
+                .getExpiration();
     }
 }

@@ -6,6 +6,7 @@ import com.escuelaposgrado.Intranet.service.UsuarioService;
 import com.escuelaposgrado.Intranet.security.jwt.JwtUtils;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,14 +24,12 @@ import java.util.List;
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class UsuarioController {
-
-    private final UsuarioService usuarioService;
-    private final JwtUtils jwtUtils;
-
-    public UsuarioController(UsuarioService usuarioService, JwtUtils jwtUtils) {
-        this.usuarioService = usuarioService;
-        this.jwtUtils = jwtUtils;
-    }
+    
+    @Autowired
+    private UsuarioService usuarioService;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
     
     /**
      * Obtener todos los usuarios con paginación
@@ -183,16 +182,13 @@ public class UsuarioController {
     @GetMapping("/perfil")
     public ResponseEntity<UsuarioDTO> obtenerPerfil(@RequestHeader("Authorization") String token) {
         try {
-            String username = extractUsername(token);
+            String jwt = token.substring(7); // Remover "Bearer "
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
             UsuarioDTO usuario = usuarioService.obtenerUsuarioPorEmail(username);
             return ResponseEntity.ok(usuario);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    private String extractUsername(String authorizationHeader) {
-        return jwtUtils.getUserNameFromJwtToken(authorizationHeader.substring(7));
     }
     
     /**

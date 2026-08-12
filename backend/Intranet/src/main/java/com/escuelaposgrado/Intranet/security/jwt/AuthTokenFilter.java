@@ -1,11 +1,11 @@
 package com.escuelaposgrado.Intranet.security.jwt;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -19,38 +19,39 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.Collections;
+
 /**
- * Valida tokens JWT en cada petición del microservicio de Intranet.
+ * Filtro para validar tokens JWT en cada petición del microservicio de Intranet
  */
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     private static final Logger authLogger = LoggerFactory.getLogger(AuthTokenFilter.class);
-    private static final String BEARER_PREFIX = "Bearer ";
-
-    private final JwtUtils jwtUtils;
-
-    public AuthTokenFilter(JwtUtils jwtUtils) {
-        this.jwtUtils = jwtUtils;
-    }
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, 
+                                  @NonNull HttpServletResponse response, 
+                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                UserDetails userDetails = User.builder()
-                        .username(username)
-                        .password("")
-                        .authorities(Collections.emptyList())
-                        .build();
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                // Crear un UserDetails básico para el usuario autenticado
+                UserDetails userDetails = User.builder()
+                    .username(username)
+                    .password("") // No necesitamos la contraseña para validación JWT
+                    .authorities(Collections.emptyList()) // Agregar roles según necesidad
+                    .build();
+
+                UsernamePasswordAuthenticationToken authentication = 
+                    new UsernamePasswordAuthenticationToken(userDetails, null, 
+                                                           userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 authLogger.debug("Usuario autenticado: {}", username);
             } else {
@@ -58,17 +59,23 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             authLogger.error("No se puede configurar la autenticación del usuario: {}", e.getMessage());
+            // Limpiar el contexto de seguridad en caso de error
             SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extraer JWT del header Authorization
+     */
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER_PREFIX)) {
-            return headerAuth.substring(BEARER_PREFIX.length());
+
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
         }
+
         return null;
     }
 }

@@ -94,10 +94,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     /**
      * Buscar usuarios por nombre o apellido (búsqueda parcial)
      */
-    @Query("SELECT u FROM Usuario u WHERE " +
-           "LOWER(u.nombres) LIKE LOWER(CONCAT('%', :texto, '%')) OR " +
-           "LOWER(u.apellidoPaterno) LIKE LOWER(CONCAT('%', :texto, '%')) OR " +
-           "LOWER(u.apellidoMaterno) LIKE LOWER(CONCAT('%', :texto, '%'))")
+    @Query("""
+            SELECT u
+            FROM Usuario u
+            WHERE LOWER(u.nombres) LIKE LOWER(CONCAT('%', :texto, '%'))
+               OR LOWER(u.apellidoPaterno) LIKE LOWER(CONCAT('%', :texto, '%'))
+               OR LOWER(u.apellidoMaterno) LIKE LOWER(CONCAT('%', :texto, '%'))
+            """)
     List<Usuario> buscarPorNombre(@Param("texto") String texto);
 
     /**

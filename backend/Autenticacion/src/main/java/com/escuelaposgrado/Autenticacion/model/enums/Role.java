@@ -5,9 +5,15 @@ package com.escuelaposgrado.Autenticacion.model.enums;
  * de la Escuela de Posgrado UNICA
  */
 public enum Role {
-    ADMIN,      // Administrador del sistema
-    DOCENTE,    // Docente/Profesor
-    ALUMNO,     // Estudiante matriculado
-    COORDINADOR,// Coordinador académico
-    POSTULANTE  // Aspirante a estudiante
+    ADMIN,
+    DOCENTE,
+    ALUMNO,
+    COORDINADOR,
+    POSTULANTE;
+
+    private static final String AUTHORITY_PREFIX = "ROLE_";
+
+    public String asAuthority() {
+        return AUTHORITY_PREFIX + name();
+    }
 }

@@ -1,7 +1,6 @@
 package com.escuelaposgrado.Intranet.controller;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -15,9 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Controlador raíz para información básica de la API de Intranet
+ * Controlador raíz para información básica de la API de Intranet.
  */
-@Tag(name = "🏠 API Info", description = "Información general de la API de Intranet")
+@Tag(
+    name = "🏠 API Info",
+    description = "Información general de la API de Intranet"
+)
 @RestController
 @RequestMapping("/")
 public class RootController {
@@ -27,36 +29,41 @@ public class RootController {
         description = "Endpoint público que proporciona información básica sobre la API de Intranet"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Información obtenida correctamente")
+        @ApiResponse(
+            responseCode = "200",
+            description = "Información obtenida correctamente"
+        )
     })
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getApiInfo() {
-        Map<String, Object> apiInfo = new HashMap<>();
-        apiInfo.put("name", "API Intranet - Escuela de Posgrado UNICA");
-        apiInfo.put("version", "1.0.0");
-        apiInfo.put("description", "API REST para el sistema de intranet académica");
-        apiInfo.put("timestamp", LocalDateTime.now());
-        apiInfo.put("port", 8081);
-        apiInfo.put("status", "running");
-        
-        Map<String, String> links = new HashMap<>();
-        links.put("health", "/health/status");
-        links.put("info", "/health/info");
-        links.put("ping", "/health/ping");
-        links.put("swagger", "/swagger-ui.html");
-        links.put("api-docs", "/v3/api-docs");
-        
-        apiInfo.put("_links", links);
-        
-        Map<String, String> endpoints = new HashMap<>();
-        endpoints.put("authentication", "/api/auth");
-        endpoints.put("users", "/api/usuarios");
-        endpoints.put("attendance", "/api/asistencias");
-        endpoints.put("grades", "/api/calificaciones");
-        endpoints.put("surveys", "/api/encuestas");
-        
-        apiInfo.put("main_endpoints", endpoints);
-        
+    public ResponseEntity<ApiInfoResponse> getApiInfo() {
+
+        Map<String, String> links = Map.of(
+            "health", "/health/status",
+            "info", "/health/info",
+            "ping", "/health/ping",
+            "swagger", "/swagger-ui.html",
+            "api-docs", "/v3/api-docs"
+        );
+
+        Map<String, String> endpoints = Map.of(
+            "authentication", "/api/auth",
+            "users", "/api/usuarios",
+            "attendance", "/api/asistencias",
+            "grades", "/api/calificaciones",
+            "surveys", "/api/encuestas"
+        );
+
+        ApiInfoResponse apiInfo = new ApiInfoResponse(
+            "API Intranet - Escuela de Posgrado UNICA",
+            "1.0.0",
+            "API REST para el sistema de intranet académica",
+            LocalDateTime.now(),
+            8081,
+            "running",
+            links,
+            endpoints
+        );
+
         return ResponseEntity.ok(apiInfo);
     }
 }

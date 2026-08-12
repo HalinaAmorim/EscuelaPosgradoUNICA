@@ -20,6 +20,8 @@ import com.escuelaposgrado.Autenticacion.dto.request.RegistroRequest;
 import com.escuelaposgrado.Autenticacion.dto.response.MessageResponse;
 import com.escuelaposgrado.Autenticacion.dto.response.UsuarioResponse;
 import com.escuelaposgrado.Autenticacion.model.enums.Role;
+import com.escuelaposgrado.Autenticacion.service.AdminCleanupService;
+import com.escuelaposgrado.Autenticacion.service.AdminExcelService;
 import com.escuelaposgrado.Autenticacion.service.AuthService;
 import com.escuelaposgrado.Autenticacion.service.DataCleanupService;
 
@@ -258,14 +260,14 @@ public class AdminController {
         return ResponseEntity.ok(usuarios);
     }
 
-    /**
-     * Desactivar usuario
-     */
-    @PutMapping("/usuarios/{id}/desactivar")
-    public ResponseEntity<MessageResponse> desactivarUsuario(@PathVariable Long id) {
-        MessageResponse response = authService.desactivarUsuario(id);
-        return ResponseEntity.ok(response);
-    }
+        /**
+         * Desactivar usuario
+         */
+        @PutMapping("/usuarios/{id}/desactivar")
+        public ResponseEntity<MessageResponse> desactivarUsuario(@PathVariable Long id) {
+                MessageResponse response = authService.desactivarUsuario(id);
+                return ResponseEntity.ok(response);
+        }
 
     /**
      * Activar usuario
@@ -395,50 +397,50 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Obtener estadísticas de usuarios
-     */
-    @GetMapping("/estadisticas")
-    public ResponseEntity<MessageResponse> getEstadisticas() {
-        MessageResponse response = authService.getEstadisticas();
-        return ResponseEntity.ok(response);
-    }
+        /**
+         * Obtener estadísticas de usuarios
+         */
+        @GetMapping("/estadisticas")
+        public ResponseEntity<MessageResponse> getEstadisticas() {
+                MessageResponse response = authService.getEstadisticas();
+                return ResponseEntity.ok(response);
+        }
 
-    /**
-     * Obtener docentes
-     */
-    @GetMapping("/docentes")
-    public ResponseEntity<List<UsuarioResponse>> getDocentes() {
-        List<UsuarioResponse> docentes = authService.getUsuariosByRole(Role.DOCENTE);
-        return ResponseEntity.ok(docentes);
-    }
+        /**
+         * Obtener docentes
+         */
+        @GetMapping("/docentes")
+        public ResponseEntity<List<UsuarioResponse>> getDocentes() {
+                List<UsuarioResponse> docentes = authService.getUsuariosByRole(Role.DOCENTE);
+                return ResponseEntity.ok(docentes);
+        }
 
-    /**
-     * Obtener coordinadores
-     */
-    @GetMapping("/coordinadores")
-    public ResponseEntity<List<UsuarioResponse>> getCoordinadores() {
-        List<UsuarioResponse> coordinadores = authService.getUsuariosByRole(Role.COORDINADOR);
-        return ResponseEntity.ok(coordinadores);
-    }
+        /**
+         * Obtener coordinadores
+         */
+        @GetMapping("/coordinadores")
+        public ResponseEntity<List<UsuarioResponse>> getCoordinadores() {
+                List<UsuarioResponse> coordinadores = authService.getUsuariosByRole(Role.COORDINADOR);
+                return ResponseEntity.ok(coordinadores);
+        }
 
-    /**
-     * Obtener alumnos
-     */
-    @GetMapping("/alumnos")
-    public ResponseEntity<List<UsuarioResponse>> getAlumnos() {
-        List<UsuarioResponse> alumnos = authService.getUsuariosByRole(Role.ALUMNO);
-        return ResponseEntity.ok(alumnos);
-    }
+        /**
+         * Obtener alumnos
+         */
+        @GetMapping("/alumnos")
+        public ResponseEntity<List<UsuarioResponse>> getAlumnos() {
+                List<UsuarioResponse> alumnos = authService.getUsuariosByRole(Role.ALUMNO);
+                return ResponseEntity.ok(alumnos);
+        }
 
-    /**
-     * Obtener postulantes
-     */
-    @GetMapping("/postulantes")
-    public ResponseEntity<List<UsuarioResponse>> getPostulantes() {
-        List<UsuarioResponse> postulantes = authService.getUsuariosByRole(Role.POSTULANTE);
-        return ResponseEntity.ok(postulantes);
-    }
+        /**
+         * Obtener postulantes
+         */
+        @GetMapping("/postulantes")
+        public ResponseEntity<List<UsuarioResponse>> getPostulantes() {
+                List<UsuarioResponse> postulantes = authService.getUsuariosByRole(Role.POSTULANTE);
+                return ResponseEntity.ok(postulantes);
+        }
 
     /**
      * Buscar usuarios por nombres y apellidos

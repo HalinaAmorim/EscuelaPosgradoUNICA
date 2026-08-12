@@ -64,6 +64,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsernameOrEmail(),
@@ -71,7 +72,9 @@ public class AuthService {
             )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
+
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         Usuario usuario = (Usuario) authentication.getPrincipal();
@@ -93,13 +96,12 @@ public class AuthService {
         }
 
         Usuario usuario = new Usuario(
-            registroRequest.getUsername(),
-            registroRequest.getEmail(),
-            encoder.encode(registroRequest.getPassword()),
-            registroRequest.getNombres(),
-            registroRequest.getApellidos(),
-            registroRequest.getRole()
-        );
+                registroRequest.getUsername(),
+                registroRequest.getEmail(),
+                encoder.encode(registroRequest.getPassword()),
+                registroRequest.getNombres(),
+                registroRequest.getApellidos(),
+                registroRequest.getRole());
 
         roleFieldsApplier.apply(usuario, RoleFieldsData.from(registroRequest));
         usuario.setDni(registroRequest.getDni());
@@ -153,6 +155,7 @@ public class AuthService {
     }
 
     public UsuarioResponse getCurrentUser(String username) {
+
         Usuario usuario = usuarioRepository.findByUsername(username)
             .orElseThrow(() -> new IllegalArgumentException(AuthMessages.USER_NOT_FOUND_PLAIN));
         return usuarioDtoMapper.toUsuarioResponse(usuario);
@@ -191,6 +194,7 @@ public class AuthService {
 
     public MessageResponse actualizarUsuarioAdmin(Long id, ActualizarUsuarioAdminRequest request) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+
         if (usuarioOpt.isEmpty()) {
             return failure(AuthMessages.USER_NOT_FOUND_PLAIN);
         }
@@ -274,4 +278,5 @@ public class AuthService {
     private MessageResponse failure(String message) {
         return new MessageResponse(message, false);
     }
+
 }

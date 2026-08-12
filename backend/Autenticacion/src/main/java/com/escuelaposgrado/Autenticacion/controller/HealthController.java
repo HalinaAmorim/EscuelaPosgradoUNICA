@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * Health checks e información del microservicio.
  */
 @Tag(name = "Salud del Sistema", description = "Endpoints para verificar el estado y salud del microservicio")
-@CrossOrigin(origins = {CorsOrigins.LOCALHOST, CorsOrigins.LOCALHOST_IP},
-             allowCredentials = "true", maxAge = 3600)
+@CrossOrigin(origins = { CorsOrigins.LOCALHOST, CorsOrigins.LOCALHOST_IP }, allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/health")
 public class HealthController {
@@ -42,29 +42,15 @@ public class HealthController {
         this.buildProperties = buildPropertiesProvider.getIfAvailable();
     }
 
-    @Operation(
-            summary = "Estado básico del servicio",
-            description = "Verifica que el microservicio esté funcionando correctamente",
-            tags = {"Salud del Sistema"}
-    )
+    @Operation(summary = "Estado básico del servicio", description = "Verifica que el microservicio esté funcionando correctamente", tags = {
+            "Salud del Sistema" })
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Servicio funcionando correctamente",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = MessageResponse.class),
-                            examples = @ExampleObject(
-                                    name = "Servicio activo",
-                                    value = """
-                                            {
-                                              "message": "Microservicio de Autenticación - ACTIVO",
-                                              "success": true
-                                            }
-                                            """
-                            )
-                    )
-            )
+            @ApiResponse(responseCode = "200", description = "Servicio funcionando correctamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponse.class), examples = @ExampleObject(name = "Servicio activo", value = """
+                    {
+                      "message": "Microservicio de Autenticación - ACTIVO",
+                      "success": true
+                    }
+                    """)))
     })
     @GetMapping("/status")
     public ResponseEntity<MessageResponse> getStatus() {

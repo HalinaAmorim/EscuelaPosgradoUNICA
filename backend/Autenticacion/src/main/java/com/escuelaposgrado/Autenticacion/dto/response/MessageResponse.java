@@ -8,12 +8,11 @@ public class MessageResponse {
     private String message;
     private boolean success;
 
-    // Constructores
-    public MessageResponse() {}
+    public MessageResponse() {
+    }
 
     public MessageResponse(String message) {
-        this.message = message;
-        this.success = true;
+        this(message, true);
     }
 
     public MessageResponse(String message, boolean success) {
@@ -21,7 +20,6 @@ public class MessageResponse {
         this.success = success;
     }
 
-    // Getters y Setters
     public String getMessage() {
         return message;
     }

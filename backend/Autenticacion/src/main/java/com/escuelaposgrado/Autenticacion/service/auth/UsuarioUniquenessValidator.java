@@ -24,18 +24,15 @@ public class UsuarioUniquenessValidator {
     }
 
     public String validateForRegistro(RegistroRequest request) {
-        if (isEstudianteRole(request.getRole()) && hasText(request.getCodigoEstudiante())
-                && usuarioRepository.findByCodigoEstudiante(request.getCodigoEstudiante()).isPresent()) {
-            return AuthMessages.CODIGO_ESTUDIANTE_IN_USE;
+        String estudianteError = validateCodigoEstudiante(request);
+        if (estudianteError != null) {
+            return estudianteError;
         }
-        if (isDocenteRole(request.getRole()) && hasText(request.getCodigoDocente())
-                && usuarioRepository.findByCodigoDocente(request.getCodigoDocente()).isPresent()) {
-            return AuthMessages.CODIGO_DOCENTE_IN_USE;
+        String docenteError = validateCodigoDocente(request);
+        if (docenteError != null) {
+            return docenteError;
         }
-        if (hasText(request.getDni()) && usuarioRepository.findByDni(request.getDni()).isPresent()) {
-            return AuthMessages.DNI_IN_USE;
-        }
-        return null;
+        return validateDni(request);
     }
 
     public String validateAdminUsernameEmail(Long id, Usuario current, ActualizarUsuarioAdminRequest request) {
@@ -48,6 +45,31 @@ public class UsuarioUniquenessValidator {
         return conflictIfChanged(
                 current.getEmail(), request.getEmail(), id, usuarioRepository::findByEmail,
                 AuthMessages.EMAIL_IN_USE_SHORT);
+    }
+
+    private String validateCodigoEstudiante(RegistroRequest request) {
+        if (!isEstudianteRole(request.getRole()) || !hasText(request.getCodigoEstudiante())) {
+            return null;
+        }
+        return presentOrNull(
+                usuarioRepository.findByCodigoEstudiante(request.getCodigoEstudiante()),
+                AuthMessages.CODIGO_ESTUDIANTE_IN_USE);
+    }
+
+    private String validateCodigoDocente(RegistroRequest request) {
+        if (!isDocenteRole(request.getRole()) || !hasText(request.getCodigoDocente())) {
+            return null;
+        }
+        return presentOrNull(
+                usuarioRepository.findByCodigoDocente(request.getCodigoDocente()),
+                AuthMessages.CODIGO_DOCENTE_IN_USE);
+    }
+
+    private String validateDni(RegistroRequest request) {
+        if (!hasText(request.getDni())) {
+            return null;
+        }
+        return presentOrNull(usuarioRepository.findByDni(request.getDni()), AuthMessages.DNI_IN_USE);
     }
 
     private String conflictIfChanged(
@@ -64,6 +86,10 @@ public class UsuarioUniquenessValidator {
             return errorMessage;
         }
         return null;
+    }
+
+    private String presentOrNull(Optional<Usuario> existing, String errorMessage) {
+        return existing.isPresent() ? errorMessage : null;
     }
 
     private boolean isEstudianteRole(Role role) {

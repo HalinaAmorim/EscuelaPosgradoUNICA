@@ -1,4 +1,4 @@
-package com.escuelaposgrado.Intranet.controller;
+package com.escuelaposgrado.Intranet.dto.response;
 
 
 public class PingResponse {

@@ -1,4 +1,4 @@
-package com.escuelaposgrado.Intranet.controller;
+package com.escuelaposgrado.Intranet.dto.response;
 
 import java.time.LocalDateTime;
 

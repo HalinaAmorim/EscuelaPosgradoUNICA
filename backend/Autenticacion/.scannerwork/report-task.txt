@@ -1,0 +1,6 @@
+projectKey=Autenticacion
+serverUrl=http://localhost:9000
+serverVersion=26.8.0.126808
+dashboardUrl=http://localhost:9000/dashboard?id=Autenticacion
+ceTaskId=7f2c9347-1b5c-414b-8c2d-bd0a6d2975e2
+ceTaskUrl=http://localhost:9000/api/ce/task?id=7f2c9347-1b5c-414b-8c2d-bd0a6d2975e2
